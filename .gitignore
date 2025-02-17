@@ -1,0 +1,17 @@
+Pipfile
+Pipfile.lock
+
+*.pyc
+tags
+/build
+/dist
+/MANIFEST
+/depoc.egg-info
+*.egg
+*.egg-info/
+.DS_Store
+.python-version
+.cache
+.tox/
+wheels/
+__pycache__
