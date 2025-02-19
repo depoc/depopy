@@ -1,6 +1,8 @@
 import requests
 
-from typing import Any, Dict, Optional, Union, Literal
+from depoc.utils._error import APIError
+
+from typing import Any, Dict, Optional, Literal
 
 
 class Requestor:
@@ -13,16 +15,24 @@ class Requestor:
         method: Literal['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
         endpoint: str,
         params: Optional[Dict[str, Any]] = None,
-    ) -> Union[Dict[str, Any], None]:
-        try:
-            response = requests.request(
-                method,
-                endpoint,
-                json=params,
-                headers=self.headers
-            )
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            print(f'API request failed: {e}')
-            return None
+    ) -> Dict[str, Any]:
+        response = requests.request(
+            method,
+            endpoint,
+            json=params,
+            headers=self.headers
+        )
+
+        if response.status_code == 404:
+            raise APIError('Not found', 404)
+
+        data = response.json()
+
+        if 'error' in data:
+            message = data.get('error').get('message')
+            status = data.get('error').get('status')
+            raise APIError(message, status)
+        
+        response.raise_for_status()
+    
+        return data

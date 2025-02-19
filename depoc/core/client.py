@@ -1,5 +1,6 @@
 from depoc.core.requestor import Requestor
 from depoc.objects.user import User
+from depoc.objects.owner import Owner
 
 
 class DepocClient(object):
@@ -9,5 +10,5 @@ class DepocClient(object):
     ):
         self.requestor = Requestor(api_key)
 
-        # top-level services
-        self.user = User(self.requestor)
+        self.me = User(self.requestor)
+        self.owner = Owner(self.requestor)
