@@ -1,32 +1,9 @@
-from typing import Optional, Dict, Any
-
-from depoc.resources.base import Resource
+from .base import T, APIResource
 
 
-class List(Resource):
+class Retrieve(APIResource[T]):
     @classmethod
-    def all(cls) -> Dict[str, Any]:
-        url = cls.class_url()
-        return cls.request('GET', url)
-
-
-class Retrieve(Resource):
-    @classmethod
-    def get(cls, resource_id: Optional[str] = None) -> Dict[str, Any]:
-        if resource_id:
-            url = f'{cls.class_url()}/{resource_id}'
-        else:
-            url = cls.class_url()
-
-        return cls.request('GET', url)
-
-
-class Update(Resource):
-    @classmethod
-    def update(
-        cls,
-        resource_id: Optional[str] = None,
-        params: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
-        url = cls.class_url()
-        return cls.request('PATCH', url, params=params)
+    def get(cls, resource_id: str | None = None) -> T:
+        url = f'{cls.endpoint}/{resource_id}' if resource_id else cls.endpoint
+        response = cls.requestor.request('GET', url)
+        return cls._convert_to_object(response)

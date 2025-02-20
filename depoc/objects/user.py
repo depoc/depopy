@@ -1,12 +1,8 @@
 from depoc.objects.base import DepocObject
-from depoc.resources.methods import Retrieve
 
 
-class User(Retrieve):
-    ''' This object represents the current authenticated user '''
-    
-    OBJECT_NAME: str = 'user'
-    OBJECT_ENDPOINT: str = 'me'
+class UserObject(DepocObject):
+    ''' Represents a user resource '''
 
     id: str
     ''' Unique identifier of the user. '''
@@ -26,8 +22,3 @@ class User(Retrieve):
     ''' Timestamp of the user's last login. '''
     date_joined: str
     ''' Timestamp of when the user registered in Depoc. '''
-
-    @classmethod
-    def get(cls, resource_id = None) -> DepocObject:
-        data = super().get(resource_id)
-        return User(data=data.get(cls.OBJECT_NAME))

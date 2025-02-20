@@ -1,36 +1,19 @@
-from depoc import BASE_URL
-from depoc.objects.base import DepocObject
+from typing import Generic, TypeVar, Type
+
 from depoc.core.requestor import Requestor
+from depoc.objects.base import DepocObject
 
-from typing import Literal, Optional, Dict, Any
+T = TypeVar('T', bound=DepocObject)
 
 
-class Resource(DepocObject):
-    _requestor: Requestor
-
-    def __init__(
-            self,
-            requestor: Optional[Requestor] = None,
-            data: Optional[Dict[str, Any]] = None,
-        ):
-        super().__init__(data)
-        cls = self.__class__
-        cls._requestor = requestor
+class APIResource(Generic[T]):
+    requestor: 'Requestor' = Requestor()
+    endpoint: str
+    obj: Type[T]
+    label: str
 
     @classmethod
-    def class_url(cls) -> str:
-        if cls == Resource:
-            raise NotImplementedError(
-                'Resource is an abstract class. You should perform '
-                'actions on its subclasses (e.g. Customer, Products)'
-            )
-        return f'{BASE_URL}/{cls.OBJECT_ENDPOINT}'
-
-    @classmethod
-    def request(
-        cls,
-        method: Literal['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
-        endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        return cls._requestor.request(method, endpoint, params)
+    def _convert_to_object(cls, data) -> T:
+        if not cls.obj:
+            raise ValueError('obj class not defined for this resource')
+        return cls.obj(data.get(cls.label))

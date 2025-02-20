@@ -1,49 +1,47 @@
 import json
 
-from typing import Optional, Dict, Any
+from typing import Any
 
 
 class DepocObject:
-    OBJECT_NAME: str
-    OBJECT_ENDPOINT: str
+    def __init__(self, data: dict[str, Any] | None = None):
+        self._values: dict[str, Any] = {}
+        if data:
+            self.refresh_from(data)
 
-    def __init__(
-            self,
-            data: Optional[Dict[str, Any]] = None,
-        ):
-        self._data = data or {}
-        self._modified_fields = set()
+    def refresh_from(self, data: dict[str, Any]) -> None:
+        for key, value in data.items():
+            setattr(self, key, value)
 
-    def __setattr__(self, k: str, v: Any) -> None:        
-        if k.startswith('_'):
-            super().__setattr__(k, v)
+    def __setattr__(self, key, value):
+        if key.startswith('_'):
+            return super().__setattr__(key, value)
+        
+        if isinstance(value, dict):
+            self._values[key] = DepocObject(value)
         else:
-            self._data[k] = v
-            self._modified_fields.add(k)
+            self._values[key] = value
 
-    def __getattr__(self, k: str) -> Any:
-        if k in self._data:
-            return self._data[k]
-        raise AttributeError(f'{k} not found in DepocObject.')
+    def __getattr__(self, name):
+        try:
+            return self._values[name]
+        except KeyError as e:
+            message = f"'{type(self).__name__}' object has no attribute '{name}'"
+            raise AttributeError(message) from e
+
+    def __repr__(self):
+        id_str = f" id={self.id}" if hasattr(self, 'id') else ""
+        return f"<{type(self).__name__}{id_str}>"
     
-    def __delattr__(self, k: str) -> Any:
-        if k[0] == '_' or k in self.__dict__:
-            return super().__delattr__(k)
-        else:
-            del self[k]
+    def __dir__(self):
+        return list(self._values.keys()) + super().__dir__()
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return f'DepocObject({json.dumps(
-            self._data,
+            self._values,
             ensure_ascii=False,
             indent=2,
         )})'
 
-    def to_dict(self) -> Dict[str, Any]:
-        return self._data.copy()
-
-    def to_json(self) -> str:
-        return json.dumps(self._data, indent=2)
-
-    def get_modified_fields(self) -> Dict[str, Any]:
-        return {k: self._data[k] for k in self._modified_fields}
+    def to_dict(self) -> dict[str, Any]:
+        return {key: value for key, value in self._values.items()}

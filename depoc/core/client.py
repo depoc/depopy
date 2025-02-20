@@ -1,14 +1,11 @@
-from depoc.core.requestor import Requestor
-from depoc.objects.user import User
-from depoc.objects.owner import Owner
+from depoc.services.user import User
+from depoc.services.owner import Owner
 
 
-class DepocClient(object):
-    def __init__(
-        self,
-        api_key: str,
-    ):
-        self.requestor = Requestor(api_key)
-
-        self.me = User(self.requestor)
-        self.owner = Owner(self.requestor)
+class DepocClient:
+    def __init__(self, token: str | None = None):
+        self._token = token
+        
+        # top-level services
+        self.me = User()
+        self.owner = Owner()

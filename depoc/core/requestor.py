@@ -1,38 +1,33 @@
+import depoc
 import requests
 
-from depoc.utils._error import APIError
+from typing import Literal, Any
 
-from typing import Any, Dict, Optional, Literal
+from depoc.utils import _handle_response
 
 
-class Requestor:
-    def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key
-        self.headers = {'Authorization': f'Bearer {api_key}'} if api_key else {}
+class Requestor(object):
+    def __init__(self):
+        self._session = requests.Session()
+        self._session.headers.update({
+            'User-Agent': 'depoc/0.0.3 (Python)',
+            'Content-Type': 'application/json',
+        })
 
     def request(
         self,
         method: Literal['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
         endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        response = requests.request(
-            method,
-            endpoint,
-            json=params,
-            headers=self.headers
-        )
-
-        if response.status_code == 404:
-            raise APIError('Not found', 404)
-
-        data = response.json()
-
-        if 'error' in data:
-            message = data.get('error').get('message')
-            status = data.get('error').get('status')
-            raise APIError(message, status)
+        params: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        url = f'{depoc.BASE_URL}/{endpoint}'
+        auth = {'Authorization': f'Bearer {depoc.token}'}
         
-        response.raise_for_status()
-    
-        return data
+        try:
+            response = self._session.request(method, url, json=params, headers=auth)
+            return _handle_response(response)
+
+        except requests.exceptions.RequestException as e:
+            raise Exception(str(e)) from e
+        except requests.exceptions.HTTPError as e:
+            raise Exception(str(e)) from e
