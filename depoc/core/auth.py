@@ -14,8 +14,8 @@ class Connection:
     def token(self):
         return self._token(self.username, self.password)
     
-    def _token(self, username: str, password: str):
+    def _token(self, username: str, password: str) -> str | None:
         requestor = Requestor()
         params: dict[str, str] = {'username': username, 'password': password}
         response = requestor.request('POST', 'token', params=params)
-        return response
+        return response.get('access')

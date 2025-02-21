@@ -1,5 +1,6 @@
 from depoc.services.user import User
 from depoc.services.owner import Owner
+from depoc.services.accounts import Accounts
 
 
 class DepocClient:
@@ -9,3 +10,4 @@ class DepocClient:
         # top-level services
         self.me = User()
         self.owner = Owner()
+        self.accounts = Accounts()
