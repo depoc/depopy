@@ -1,4 +1,4 @@
-from depoc.objects.base import DepocObject
+from .base import DepocObject
 
 
 class UserObject(DepocObject):

@@ -5,6 +5,7 @@ from depoc.core.auth import Connection
 from depoc.services.user import User
 from depoc.services.owner import Owner
 from depoc.services.accounts import Accounts
+from depoc.services.business import Business
 
 
 token: str | None = None
