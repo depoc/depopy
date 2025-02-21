@@ -2,6 +2,9 @@ from depoc.core.requestor import Requestor
 from depoc.core.client import DepocClient
 from depoc.core.auth import Connection
 
+from depoc.services.user import User
+from depoc.services.owner import Owner
+
 
 token: str | None = None
 

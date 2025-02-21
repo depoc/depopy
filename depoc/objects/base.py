@@ -6,21 +6,20 @@ from typing import Any
 class DepocObject:
     def __init__(self, data: dict[str, Any] | None = None):
         self._values: dict[str, Any] = {}
+        self._changes: set = set()
         if data:
             self.refresh_from(data)
 
     def refresh_from(self, data: dict[str, Any]) -> None:
+        self._changes.clear()
         for key, value in data.items():
-            setattr(self, key, value)
+            self._values[key] = value
 
     def __setattr__(self, key, value):
         if key.startswith('_'):
             return super().__setattr__(key, value)
-        
-        if isinstance(value, dict):
-            self._values[key] = DepocObject(value)
-        else:
-            self._values[key] = value
+        self._values[key] = value
+        self._changes.add(key)
 
     def __getattr__(self, name):
         try:
@@ -45,3 +44,7 @@ class DepocObject:
 
     def to_dict(self) -> dict[str, Any]:
         return {key: value for key, value in self._values.items()}
+    
+    @property
+    def changes(self):
+        return {k: self._values[k] for k in self._changes}
