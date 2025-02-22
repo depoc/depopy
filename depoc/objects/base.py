@@ -11,6 +11,16 @@ class DepocObjectEncoder(json.JSONEncoder):
 
 
 class DepocObject:
+    # Paginator attributes
+    count: int
+    ''' Total number of results available. '''
+    results: list
+    ''' List containing the current page of results. '''
+    next: str
+    ''' URL to the next page of results, if available. '''
+    previous: str
+    ''' URL to the previous page of results, if available. '''
+
     def __init__(self, data: dict[str, Any] | None = None):
         self._values: dict[str, Any] = {}
         self._changes: set = set()

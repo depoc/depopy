@@ -4,6 +4,7 @@ from depoc.services.account import Account
 from depoc.services.business import Business
 from depoc.services.customer import Customer
 from depoc.services.supplier import Supplier
+from depoc.services.contact import Contact
 
 
 class DepocClient:
@@ -17,3 +18,4 @@ class DepocClient:
         self.business = Business()
         self.customers = Customer()
         self.suppliers = Supplier()
+        self.contacts = Contact()
