@@ -31,5 +31,5 @@ class BusinessObject(DepocObject):
     ''' Primary contact phone number for the business. '''
     email: str
     ''' Primary contact email address for the business. '''
-    is_active: str
+    is_active: bool
     ''' Indicates whether the business account is active. '''

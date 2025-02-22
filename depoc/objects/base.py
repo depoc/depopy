@@ -3,6 +3,13 @@ import json
 from typing import Any
 
 
+class DepocObjectEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, DepocObject):
+            return o.to_dict()
+        return super().default(o)
+
+
 class DepocObject:
     def __init__(self, data: dict[str, Any] | None = None):
         self._values: dict[str, Any] = {}
@@ -13,13 +20,24 @@ class DepocObject:
     def refresh_from(self, data: dict[str, Any]) -> None:
         self._changes.clear()
         for key, value in data.items():
-            self._values[key] = value
+            if isinstance(value, dict):
+                self._values[key] = DepocObject(value)
+            elif isinstance(value, list):
+                self._values[key] = [DepocObject(item) for item in value]
+            else:
+                self._values[key] = value
 
     def __setattr__(self, key, value):
         if key.startswith('_'):
             return super().__setattr__(key, value)
-        self._values[key] = value
-        self._changes.add(key)
+        else:
+            self._changes.add(key)
+            if isinstance(value, dict):
+                self._values[key] = DepocObject(value)
+            elif isinstance(value, list):
+                self._values[key] = [DepocObject(item) for item in value]
+            else:
+                self._values[key] = value
 
     def __getattr__(self, name):
         try:
@@ -38,6 +56,7 @@ class DepocObject:
     def __str__(self) -> str:
         return f'DepocObject({json.dumps(
             self._values,
+            cls=DepocObjectEncoder,
             ensure_ascii=False,
             indent=2,
         )})'

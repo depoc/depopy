@@ -1,7 +1,7 @@
 from depoc.objects.base import DepocObject
 
 
-class AccountsObject(DepocObject):
+class AccountObject(DepocObject):
     ''' Represents the current user account resource '''
 
     id: str

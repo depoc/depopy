@@ -4,11 +4,12 @@ from depoc.core.auth import Connection
 
 from depoc.services.user import User
 from depoc.services.owner import Owner
-from depoc.services.accounts import Accounts
+from depoc.services.account import Account
 from depoc.services.business import Business
+from depoc.services.customer import Customer
 
 
 token: str | None = None
 
 # Constants
-BASE_URL: str = 'https://api.depoc.com.br'
+BASE_URL: str = 'http://127.0.0.1:8000'

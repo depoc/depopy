@@ -18,6 +18,7 @@ def _handle_response(response: Response) -> dict[str, Any]:
         error = data.get('error', {})
         message = error.get('message')
         status = error.get('status')
-        raise APIError(message, status)
+        details = error.get('details')
+        raise APIError(message, status, details)
     
     return data
