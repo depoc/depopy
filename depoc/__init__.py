@@ -7,6 +7,7 @@ from depoc.services.owner import Owner
 from depoc.services.account import Account
 from depoc.services.business import Business
 from depoc.services.customer import Customer
+from depoc.services.supplier import Supplier
 
 
 token: str | None = None

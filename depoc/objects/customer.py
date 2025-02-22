@@ -7,7 +7,8 @@ class CustomerObject(DepocObject):
     contact information, and transaction history.
     '''
 
-    # Resource attributes
+    id: str
+    ''' Unique identifier for the customer '''
     name: str
     ''' Full name of the customer. '''
     alias: str
