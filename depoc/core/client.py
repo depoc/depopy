@@ -11,6 +11,7 @@ from depoc.services.finance import (
     FinancialTransaction,
 )
 from depoc.services.member import Member
+from depoc.services.product import Product, ProductCategory, ProductCost
 
 
 class DepocClient:
@@ -29,3 +30,7 @@ class DepocClient:
         self.financial_categories = FinancialCategory()
         self.financial_transactions = FinancialTransaction()
         self.members = Member()
+        self.products = Product()
+        self.product_categories = ProductCategory()
+        self.product_cost = ProductCost()
+        
