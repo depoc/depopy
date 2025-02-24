@@ -50,9 +50,10 @@ class Retrieve(APIResource[T]):
 
         endpoint = f'{endpoint}/{resource_id}' if resource_id else endpoint
 
-        if '<id>' in endpoint and resource_id and resource_id2:
+        if '<id>' in endpoint and resource_id:
             endpoint = cls.endpoint.replace('<id>', resource_id)
-            endpoint += f'/{resource_id2}'
+            if resource_id2:
+                endpoint += f'/{resource_id2}'
 
         response = cls.requestor.request('GET', endpoint)
         return cls._convert_to_object(response)
@@ -86,9 +87,10 @@ class Update(APIResource[T]):
 
         endpoint = f'{endpoint}/{resource_id}' if resource_id else endpoint
 
-        if '<id>' in endpoint and resource_id and resource_id2:
+        if '<id>' in endpoint and resource_id:
             endpoint = cls.endpoint.replace('<id>', resource_id)
-            endpoint += f'/{resource_id2}'
+            if resource_id2:
+                endpoint += f'/{resource_id2}'
 
         response = cls.requestor.request('PATCH', endpoint, params)
         return cls._convert_to_object(response)

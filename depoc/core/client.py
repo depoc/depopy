@@ -12,6 +12,11 @@ from depoc.services.finance import (
 )
 from depoc.services.member import Member
 from depoc.services.product import Product, ProductCategory, ProductCost
+from depoc.services.inventory import (
+    Inventory,
+    ProductInventory,
+    InventoryTransaction,
+)
 
 
 class DepocClient:
@@ -33,4 +38,7 @@ class DepocClient:
         self.products = Product()
         self.product_categories = ProductCategory()
         self.product_cost = ProductCost()
+        self.inventory = Inventory()
+        self.product_inventory = ProductInventory()
+        self.inventory_transaction = InventoryTransaction()
         
