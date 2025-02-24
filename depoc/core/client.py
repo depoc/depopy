@@ -17,6 +17,8 @@ from depoc.services.inventory import (
     ProductInventory,
     InventoryTransaction,
 )
+from depoc.services.payable import Payable, PayableSettle
+from depoc.services.receivable import Receivable, ReceivableSettle
 
 
 class DepocClient:
@@ -41,4 +43,8 @@ class DepocClient:
         self.inventory = Inventory()
         self.product_inventory = ProductInventory()
         self.inventory_transaction = InventoryTransaction()
+        self.payables = Payable()
+        self.payable_settle = PayableSettle()
+        self.receivables = Receivable()
+        self.receivable_settle = ReceivableSettle()
         
