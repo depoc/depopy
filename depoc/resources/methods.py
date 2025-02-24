@@ -16,17 +16,13 @@ class Finder(APIResource[T]):
         endpoint = f'{cls.endpoint}/?'
 
         if search:
-            endpoint += f'search={search}'
+            endpoint += f'&search={search}'
         
         if date:
-            endpoint += f'date={date}'
-        elif date and search:
             endpoint += f'&date={date}'
 
         if start_date and end_date:
-            endpoint += f'start_date={start_date}&end_date={end_date}'
-        elif start_date and endpoint and search:
-            endpoint += f'&start_date={start_date}&end_date={end_date}'            
+            endpoint += f'&start_date={start_date}&end_date={end_date}'
 
         response = cls.requestor.request('GET', endpoint)
         return cls._paginate(response, limit)

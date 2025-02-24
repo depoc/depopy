@@ -5,6 +5,11 @@ from depoc.services.business import Business
 from depoc.services.customer import Customer
 from depoc.services.supplier import Supplier
 from depoc.services.contact import Contact
+from depoc.services.finance import (
+    FinancialAccount,
+    FinancialCategory,
+    FinancialTransaction,
+)
 
 
 class DepocClient:
@@ -19,3 +24,6 @@ class DepocClient:
         self.customers = Customer()
         self.suppliers = Supplier()
         self.contacts = Contact()
+        self.financial_accounts = FinancialAccount()
+        self.financial_categories = FinancialCategory()
+        self.financial_transactions = FinancialTransaction()
