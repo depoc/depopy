@@ -10,6 +10,7 @@ from depoc.services.finance import (
     FinancialCategory,
     FinancialTransaction,
 )
+from depoc.services.member import Member
 
 
 class DepocClient:
@@ -27,3 +28,4 @@ class DepocClient:
         self.financial_accounts = FinancialAccount()
         self.financial_categories = FinancialCategory()
         self.financial_transactions = FinancialTransaction()
+        self.members = Member()
