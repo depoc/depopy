@@ -42,16 +42,16 @@ class FinancialTransactionObject(DepocObject):
     id: str
     '''Unique identifier for the transaction.'''
 
-    category: str
+    category: dict
     '''ID of the associated financial category.'''
 
-    operator: str
+    operator: dict
     '''ID of the user or entity that performed the transaction.'''
 
-    account: str
+    account: dict
     '''ID of the account involved in the transaction.'''
 
-    contact: str
+    contact: dict
     '''ID of the related contact or client.'''
 
     payment: str

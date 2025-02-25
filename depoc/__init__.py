@@ -1,3 +1,5 @@
+import json
+
 from depoc.core.requestor import Requestor
 from depoc.core.client import DepocClient
 from depoc.core.auth import Connection
@@ -12,5 +14,12 @@ from depoc.services.supplier import Supplier
 
 token: str | None = None
 
+try:
+    with open('.token.json', 'r') as f:
+        data: dict = json.load(f)
+        token = data.get('token')
+except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+    pass
+
 # Constants
-BASE_URL: str = 'http://127.0.0.1:8000'
+BASE_URL: str = 'https://api.depoc.com.br'

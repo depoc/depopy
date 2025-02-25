@@ -16,3 +16,4 @@ tags
 wheels/
 __pycache__
 .mypy_cache
+.token.json

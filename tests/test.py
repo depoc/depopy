@@ -1,0 +1,11 @@
+import depoc
+from depoc import DepocClient
+
+# depoc.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwNTc1MDAwLCJpYXQiOjE3NDAxNDMwMDAsImp0aSI6ImFhNmRiNzNlM2I1NTRmMjJiMmViYzg1ZmFmNjg3ODgwIiwidXNlcl9pZCI6IjAxSk02OFA0M0c3UVBIRjA3WDY3UDBSRUFTIn0.ihDVp8qxJz5ckWwB092RqayIezl90vmuYhZpLDg4zJc'
+
+client = DepocClient()
+
+auth = depoc.Connection('depoc', 'lojadepoc')
+depoc.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwNTk0MjQ5LCJpYXQiOjE3NDAxNjIyNDksImp0aSI6ImRhN2RmNDc4OGUyMDQxYzZiNTg4NzUyYTc1Y2Q0NDUwIiwidXNlcl9pZCI6IjAxSk1NVzE3WTZRMkQzN1dXSzdERlRTWFZSIn0.jEMIAGYXw5g5y6YFVGDZC1S5HCV1upFLLFMV9W-2jUI'
+
+
