@@ -33,5 +33,7 @@ class APIResource(Generic[T]):
             results = data.get('results', [])
             extracted_results = [result.get(cls.label) for result in results]
             data['results'] = extracted_results[:limit]
+        else:
+            data['results'] = data['results'][:limit]
 
         return cls.obj(data)
