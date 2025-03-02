@@ -151,7 +151,7 @@ def filter(
     end_date: str,
     limit: int,
     ) -> None:
-    ''' Retrieve all transactions. '''
+    ''' Filter transactions. '''
     service = client.financial_transactions.filter
 
     if response := _handle_response(
