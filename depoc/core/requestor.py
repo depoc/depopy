@@ -24,7 +24,12 @@ class Requestor(object):
         auth = {'Authorization': f'Bearer {depoc.token}'}
         
         try:
-            response = self._session.request(method, url, json=params, headers=auth)
+            response = self._session.request(
+                method,
+                url,
+                json=params,
+                headers=auth,
+            )
             return _handle_response(response)
 
         except requests.exceptions.RequestException as e:
