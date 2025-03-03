@@ -106,7 +106,9 @@ def all(limit: int, page: int, detailed: bool) -> None:
         if response.next:
             click.echo(f'Select next page: --page <number>')
 
-        for obj in response.results:
+        results = sorted(response.results, key=lambda obj: obj.due_at)
+
+        for obj in results:
             total_payable += float(obj.outstanding_balance)
             title = f'\n{obj.contact}'
             header = f'R$ {obj.total_amount}'
@@ -251,7 +253,9 @@ def filter(
         if response.next:
             click.echo(f'Select next page: --page <number>')
 
-        for obj in response.results:
+        results = sorted(response.results, key=lambda obj: obj.due_at)
+
+        for obj in results:
             total_payable += float(obj.outstanding_balance)
             title = f'\n{obj.contact}'
             header = f'R$ {obj.total_amount}'
