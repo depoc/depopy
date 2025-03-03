@@ -88,18 +88,26 @@ def get(id: str) -> None:
 @transaction.command
 @click.option('-l', '--limit', default=10)
 @click.option('-p', '--page', default=0)
-def all(limit: int, page: int) -> None:
+@click.option('-b', '--bank')
+def all(limit: int, page: int, bank: str) -> None:
     ''' Retrieve all transactions. '''
     service = client.financial_transactions.all
 
     if response := _handle_response(service, limit=limit, page=page):
-        click.echo(f'\nResults: {response.count}')
-        if limit < response.count:
-            click.echo(f'Showing: {limit} out of {response.count}') 
-        if response.next:
-            click.echo(f'Select next page: --page <number>')
+        results = response.results
+        if bank:
+            results = [
+                obj for obj in results if obj.account.name == bank.title()
+            ]
+            click.echo(f'\nResults: {len(results)}')
+        else:
+            click.echo(f'\nResults: {response.count}')
+            if limit < response.count:
+                click.echo(f'Showing: {limit} out of {response.count}') 
+            if response.next:
+                click.echo(f'Select next page: --page <number>')
 
-        for obj in response.results:
+        for obj in results:
             header = f'R$ {obj.amount}'
             title = f'\n{obj.account.name} {obj.type}'
             remove = [
@@ -143,12 +151,14 @@ def delete(id: str) -> None:
 @click.option('-d', '--date')
 @click.option('-sd', '--start-date')
 @click.option('-ed', '--end-date')
+@click.option('-b', '--bank')
 @click.option('-l', '--limit', default=10)
 def filter(
     search: str,
     date: str,
     start_date: str,
     end_date: str,
+    bank: str,
     limit: int,
     ) -> None:
     ''' Filter transactions. '''
@@ -162,13 +172,20 @@ def filter(
         end_date=end_date,
         limit=limit,
     ):
-        click.echo(f'\nResults: {response.count}')
-        if limit < response.count:
-            click.echo(f'Showing: {limit} out of {response.count}') 
-        if response.next:
-            click.echo(f'Select next page: --page <number>')
+        results = response.results
+        if bank:
+            results = [
+                obj for obj in results if obj.account.name == bank.title()
+            ]
+            click.echo(f'\nResults: {len(results)}')
+        else:
+            click.echo(f'\nResults: {response.count}')
+            if limit < response.count:
+                click.echo(f'Showing: {limit} out of {response.count}') 
+            if response.next:
+                click.echo(f'Select next page: --page <number>')
 
-        for obj in response.results:
+        for obj in results:
             header = f'R$ {obj.amount}'
             title = f'\n{obj.account.name} {obj.type}'
             remove = [
