@@ -8,7 +8,7 @@ LONG_DESCRIPTION: str = (
 
 setup(
     name='depoc',
-    version='0.0.10',
+    version='0.1.0',
     description='Python bindings for the Depoc API',
     long_description=LONG_DESCRIPTION,
     author='Hugo Belém',
