@@ -6,6 +6,7 @@ from .commands import logout
 from .commands import me
 from .commands import finance
 from .commands import contact
+from .commands import receivable
 
 @click.group()
 def main() -> None:
@@ -19,3 +20,4 @@ main.add_command(finance.bank)
 main.add_command(finance.category)
 main.add_command(finance.transaction)
 main.add_command(contact)
+main.add_command(receivable)
