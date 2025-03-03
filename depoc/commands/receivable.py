@@ -235,6 +235,7 @@ def filter(
         click.echo(ctx.get_help())
         sys.exit(0)
 
+    total_receivable: float = 0
     service = client.receivables.filter
 
     if response := _handle_response(
@@ -250,6 +251,7 @@ def filter(
             click.echo(f'Select next page: --page <number>')
 
         for obj in response.results:
+            total_receivable += float(obj.outstanding_balance)
             title = f'\n{obj.contact}'
             header = f'R$ {obj.total_amount}'
             highlight = f'{obj.status.replace('_', ' ').upper()}'
@@ -258,3 +260,7 @@ def filter(
             [item for item in obj.to_dict().keys() if item in fields]
 
             _format_response(obj, title, header, highlight, remove=remove)
+
+        format_total_receivable = f'R$ {total_receivable:.2f}'
+        txt = f'\n{'Total to be received: ' + format_total_receivable:>50}\n'
+        click.echo(txt)
