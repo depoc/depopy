@@ -8,14 +8,18 @@ LONG_DESCRIPTION: str = (
 
 setup(
     name='depoc',
-    version='0.0.9',
+    version='0.0.10',
     description='Python bindings for the Depoc API',
     long_description=LONG_DESCRIPTION,
     author='Hugo Belém',
     url='https://github.com/hugobelem/depoc-api',
     license='MIT',
     packages=find_packages(exclude=['tests', 'tests.*']),
-    install_requires=['requests >= 2.32.3', 'click  >= 8.1.8'],
+    install_requires=[
+        'requests >= 2.32.3',
+        'click  >= 8.1.8',
+        'appdirs >= 1.4.4',
+    ],
     entry_points={
         'console_scripts': [
             'depoc = depoc.cli:main',
