@@ -153,7 +153,9 @@ def delete(id: str) -> None:
 @click.option('-ed', '--end-date')
 @click.option('-b', '--bank')
 @click.option('-l', '--limit', default=10)
+@click.pass_context
 def filter(
+    ctx,
     search: str,
     date: str,
     start_date: str,
@@ -162,6 +164,10 @@ def filter(
     limit: int,
     ) -> None:
     ''' Filter transactions. '''
+    if not any([search, date, start_date, end_date]):
+        click.echo(ctx.get_help())
+        sys.exit(0)
+
     service = client.financial_transactions.filter
 
     if response := _handle_response(
