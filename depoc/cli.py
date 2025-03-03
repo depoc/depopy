@@ -8,6 +8,7 @@ from .commands import finance
 from .commands import contact
 from .commands import receivable
 from .commands import payable
+from .commands import report
 
 @click.group()
 def main() -> None:
@@ -23,3 +24,4 @@ main.add_command(finance.transaction)
 main.add_command(contact)
 main.add_command(receivable)
 main.add_command(payable)
+main.add_command(report)
