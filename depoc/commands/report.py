@@ -42,7 +42,7 @@ def report(ctx, date: str, start_date: str, end_date: str) -> None:
         for obj in receivables_response.results:
             total_receivable += float(obj.outstanding_balance)
         format_total_receivable = f'R$ {total_receivable:.2f}'
-        txt = f'TO BE RECEIVED{format_total_receivable:>36}'
+        txt = f'RECEIVABLE{format_total_receivable:>40}'
         click.echo(txt)
         click.echo(division)
 
@@ -55,7 +55,7 @@ def report(ctx, date: str, start_date: str, end_date: str) -> None:
         for obj in payables_response.results:
             total_payable += float(obj.outstanding_balance)
         format_total_payable = f'R$ {total_payable:.2f}'
-        txt = f'TO BE PAID{format_total_payable:>40}'
+        txt = f'PAYABLE{format_total_payable:>43}'
         click.echo(txt)
 
     total_balance = round(
