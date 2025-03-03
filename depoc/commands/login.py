@@ -16,7 +16,7 @@ def login(username: str, password: str) -> None :
         depoc.token = auth.token
         click.echo(f'Welcome!')
 
-        with open('./utils/token.json', 'w') as f:
+        with open('depoc/commands/utils/token.json', 'w') as f:
             json.dump({'token': auth.token}, f)
             
     except APIError as e:

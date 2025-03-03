@@ -15,7 +15,7 @@ from depoc.services.supplier import Supplier
 token: str | None = None
 
 try:
-    with open('token.json', 'r') as f:
+    with open('depoc/commands/utils/token.json', 'r') as f:
         data: dict = json.load(f)
         token = data.get('token')
 except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:

@@ -4,5 +4,5 @@ import click
 
 @click.command(help='Logout of your account')
 def logout() -> None:
-    with open('./utils/token.json', 'w') as f:
+    with open('depoc/commands/utils/token.json', 'w') as f:
         json.dump({'token': None}, f)
