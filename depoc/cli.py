@@ -1,11 +1,11 @@
 import click
 
-from commands import account
-from commands import login
-from commands import logout
-from commands import me
-from commands import finance
-from commands import contact
+from .commands import account
+from .commands import login
+from .commands import logout
+from .commands import me
+from .commands import finance
+from .commands import contact
 
 @click.group()
 def main() -> None:

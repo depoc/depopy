@@ -8,7 +8,7 @@ LONG_DESCRIPTION: str = (
 
 setup(
     name='depoc',
-    version='0.0.4',
+    version='0.0.5',
     description='Python bindings for the Depoc API',
     long_description=LONG_DESCRIPTION,
     author='Hugo Belém',
@@ -18,7 +18,7 @@ setup(
     install_requires=['requests >= 2.32.3'],
     entry_points={
         'console_scripts': [
-            'depoc = cli:main',
+            'depoc = depoc.cli:main',
         ],
     },
     python_requires='>=3.12',
