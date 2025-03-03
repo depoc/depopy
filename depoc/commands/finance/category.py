@@ -13,7 +13,7 @@ client = depoc.DepocClient()
 
 @click.group
 def category() -> None:
-    ''' Manage Financial Categories '''
+    ''' Manage financial categories '''
     pass
 
 @category.command

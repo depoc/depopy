@@ -10,7 +10,7 @@ client = depoc.DepocClient()
 
 @click.group
 def bank() -> None:
-    ''' Manage Bank Accounts '''
+    ''' Manage bank accounts '''
     pass
 
 @bank.command

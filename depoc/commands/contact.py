@@ -10,7 +10,7 @@ client = depoc.DepocClient()
 
 @click.group
 def contact() -> None:
-    ''' Contacts - Retrieve all and Filter. '''
+    ''' Contacts - retrieve all and filter. '''
     pass
 
 @contact.command
