@@ -86,7 +86,7 @@ def get(id: str) -> None:
         )
 
 @transaction.command
-@click.option('-l', '--limit', default=10)
+@click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
 @click.option('-b', '--bank')
 def all(limit: int, page: int, bank: str) -> None:
@@ -103,9 +103,11 @@ def all(limit: int, page: int, bank: str) -> None:
         else:
             click.echo(f'\nResults: {response.count}')
             if limit < response.count:
-                click.echo(f'Showing: {limit} out of {response.count}') 
+                click.echo(
+                    f'Showing: {len(response.results)} out of {response.count}'
+                ) 
             if response.next:
-                click.echo(f'Select next page: --page <number>')
+                click.echo(f'For next page: --page <number>')
 
         for obj in results:
             header = f'R$ {obj.amount}'
@@ -152,7 +154,7 @@ def delete(id: str) -> None:
 @click.option('-sd', '--start-date')
 @click.option('-ed', '--end-date')
 @click.option('-b', '--bank')
-@click.option('-l', '--limit', default=10)
+@click.option('-l', '--limit', default=50)
 @click.pass_context
 def filter(
     ctx,
@@ -187,9 +189,11 @@ def filter(
         else:
             click.echo(f'\nResults: {response.count}')
             if limit < response.count:
-                click.echo(f'Showing: {limit} out of {response.count}') 
+                click.echo(
+                    f'Showing: {len(response.results)} out of {response.count}'
+                ) 
             if response.next:
-                click.echo(f'Select next page: --page <number>')
+                click.echo(f'For next page: --page <number>')
 
         for obj in results:
             header = f'R$ {obj.amount}'

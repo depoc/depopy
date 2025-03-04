@@ -92,7 +92,7 @@ def get(id: str) -> None:
         _format_response(obj, title, header, highlight)
 
 @receivable.command
-@click.option('-l', '--limit', default=10)
+@click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
 @click.option('-d', '--detailed', is_flag=True)
 def all(limit: int, page: int, detailed: bool) -> None:
@@ -103,8 +103,12 @@ def all(limit: int, page: int, detailed: bool) -> None:
 
     if response := _handle_response(service, limit=limit, page=page):
         click.echo(f'\nResults: {response.count}')
+        if limit < response.count:
+            click.echo(
+                f'Showing: {len(response.results)} out of {response.count}'
+            ) 
         if response.next:
-            click.echo(f'Select next page: --page <number>')
+            click.echo(f'For next page: --page <number>')
 
         results = sorted(response.results, key=lambda obj: obj.due_at)
 
@@ -119,6 +123,8 @@ def all(limit: int, page: int, detailed: bool) -> None:
 
             _format_response(obj, title, header, highlight, remove=remove)
 
+        division = click.style(f'\n{'':-<49}', bold=True)
+        click.echo(division)
         format_total_receivable = f'R$ {total_receivable:.2f}'
         txt = f'\n{'Total to be received: ' + format_total_receivable:>50}\n'
         click.echo(txt)
@@ -220,7 +226,7 @@ def settle(id: str, amount: float, account: str) -> None:
 @click.option('-d', '--date')
 @click.option('-sd', '--start-date')
 @click.option('-ed', '--end-date')
-@click.option('-l', '--limit', default=10)
+@click.option('-l', '--limit', default=50)
 @click.option('--detailed', is_flag=True)
 @click.pass_context
 def filter(
@@ -249,8 +255,13 @@ def filter(
         limit=limit,
     ):
         click.echo(f'\nResults: {response.count}')
+        click.echo(f'\nResults: {response.count}')
+        if limit < response.count:
+            click.echo(
+                f'Showing: {len(response.results)} out of {response.count}'
+            ) 
         if response.next:
-            click.echo(f'Select next page: --page <number>')
+            click.echo(f'For next page: --page <number>')
 
         results = sorted(response.results, key=lambda obj: obj.due_at)
 
@@ -265,6 +276,8 @@ def filter(
 
             _format_response(obj, title, header, highlight, remove=remove)
 
+        division = click.style(f'\n{'':-<49}', bold=True)
+        click.echo(division)
         format_total_receivable = f'R$ {total_receivable:.2f}'
         txt = f'\n{'Total to be received: ' + format_total_receivable:>50}\n'
         click.echo(txt)

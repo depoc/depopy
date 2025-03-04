@@ -27,10 +27,8 @@ def _format_response(
     except AttributeError:
         pass
 
-    title = click.style(f'{title.upper():-<51}', fg=color, bold=True)
-    division = click.style(f'\n{'':->50}', fg=color, bold=True)
+    title = click.style(f'{title.upper():-<50}', fg=color, bold=True)
     header = click.style(f'\n{header:>50}', bold=True)
-    space = '\n'
 
     if highlight:
         highlight = click.style(f'\n{highlight:>50}', bold=True)
@@ -56,8 +54,6 @@ def _format_response(
         f'{title}'
         f'{header}'
         f'{highlight if highlight else ''}'
-        f'{space}'
         f'{body}'
-        f'{division}'
     )
     click.echo(response)

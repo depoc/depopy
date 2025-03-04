@@ -14,7 +14,7 @@ def contact() -> None:
     pass
 
 @contact.command
-@click.option('-l', '--limit', default=10)
+@click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
 @click.option('-d', '--detailed', is_flag=True)
 def all(limit: int, page: int, detailed: bool) -> None:
@@ -24,13 +24,15 @@ def all(limit: int, page: int, detailed: bool) -> None:
     if response := _handle_response(service, limit=limit, page=page):
         click.echo(f'\nResults: {response.count}')
         if limit < response.count:
-            click.echo(f'Showing: {limit} out of {response.count}') 
+            click.echo(
+                f'Showing: {len(response.results)} out of {response.count}'
+            ) 
         if response.next:
-            click.echo(f'Select next page: --page <number>')
+            click.echo(f'For next page: --page <number>')
 
         for obj in response.results:
             if hasattr(obj, 'customer'):
-                title = f'\n{obj.customer.name}'
+                title = f'{obj.customer.name}'
                 header = 'customer'
                 highlight = obj.customer.alias
                 obj = obj.customer
@@ -48,7 +50,7 @@ def all(limit: int, page: int, detailed: bool) -> None:
 
 @contact.command
 @click.option('-s', '--search')
-@click.option('-l', '--limit', default=10)
+@click.option('-l', '--limit', default=50)
 @click.option('-d', '--detailed', is_flag=True)
 def filter(search: str, limit: int, detailed: bool) -> None:
     ''' Filter contacts. '''
@@ -57,9 +59,11 @@ def filter(search: str, limit: int, detailed: bool) -> None:
     if response := _handle_response(service, search=search, limit=limit):
         click.echo(f'\nResults: {response.count}')
         if limit < response.count:
-            click.echo(f'Showing: {limit} out of {response.count}') 
+            click.echo(
+                f'Showing: {len(response.results)} out of {response.count}'
+            ) 
         if response.next:
-            click.echo(f'Select next page: --page <number>')
+            click.echo(f'For next page: --page <number>')
 
         for obj in response.results:
             if hasattr(obj, 'customer'):
