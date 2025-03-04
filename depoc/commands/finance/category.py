@@ -41,15 +41,32 @@ def get(id: str) -> None:
             _format_response(obj, obj.name, highlight)
 
 @category.command
-def all() -> None:
+@click.option('-l', '--limit', default=50)
+@click.option('-p', '--page', default=0)
+@click.option('--oneline', is_flag=True)
+def all(limit: int, page: int, oneline: bool) -> None:
     ''' Retrieve all categories '''
     service = client.financial_categories.all
 
-    if response := _handle_response(service):
+    if response := _handle_response(service, limit=limit, page=page):
+        click.echo(f'\nResults: {response.count}')
+        if limit < response.count:
+            click.echo(
+                f'Showing: {len(response.results)} out of {response.count}'
+            ) 
+        if response.next:
+            click.echo(f'For next page: --page <number>')
+
         for obj in response.results:
             highlight = f'{obj.parent.name}' if obj.parent.name else ''
             remove = ['name', 'is_active', 'parent']
-            _format_response(obj, obj.name, highlight, remove=remove)
+
+            if oneline:
+                message = f'{obj.name.upper()}: {obj.id}'
+                style = click.style(message, fg='yellow', bold=True)
+                click.echo(style)
+            else:
+                _format_response(obj, obj.name, highlight, remove=remove)
 
 @category.command
 @click.argument('id')
