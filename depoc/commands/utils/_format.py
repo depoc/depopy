@@ -1,4 +1,7 @@
 import click
+import sys
+import itertools
+import time
 
 from typing import Literal
 
@@ -57,3 +60,12 @@ def _format_response(
         f'{body}'
     )
     click.echo(response)
+
+
+def spinner() -> None:
+    spinner_cycle = itertools.cycle(['-', '\\', '|', '/'])
+    for _ in range(20):
+        sys.stdout.write(f'\rDeleting {next(spinner_cycle)} ')
+        sys.stdout.flush()
+        time.sleep(0.1)
+    click.echo('')

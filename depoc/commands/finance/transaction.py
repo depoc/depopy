@@ -1,12 +1,13 @@
 import depoc
 import click
 import sys
+import time
 
 from typing import Any
 from datetime import datetime
 
 from ..utils._response import _handle_response
-from ..utils._format import _format_response
+from ..utils._format import _format_response, spinner
 
 
 client = depoc.DepocClient()
@@ -132,8 +133,8 @@ def all(limit: int, page: int, bank: str) -> None:
             )
 
 @transaction.command
-@click.argument('id')
-def delete(id: str) -> None:
+@click.argument('ids', nargs=-1)
+def delete(ids: str) -> None:
     ''' Delete an specific transaction. '''
     service = client.financial_transactions.delete
 
@@ -145,8 +146,13 @@ def delete(id: str) -> None:
         elif confirmation == 'y':
             break
 
-    if obj := _handle_response(service, resource_id=id):
-        _format_response(obj, 'DELETED', 'Done', color='red')
+    if len(ids) > 1:
+        spinner()
+
+    for id in ids:
+        time.sleep(0.5)
+        if obj := _handle_response(service, resource_id=id):
+            _format_response(obj, 'DELETED', 'Done', color='red')
 
 @transaction.command
 @click.option('-s', '--search')

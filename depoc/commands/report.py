@@ -58,17 +58,19 @@ def report(ctx, date: str, start_date: str, end_date: str) -> None:
         txt = f'PAYABLE{format_total_payable:>43}'
         click.echo(txt)
 
-    total_balance = round(
-        current_balance + total_receivable - total_payable, 
-        2
-    )
-    
-    color = 'red' if total_balance < 0 else 'green'
+        total_balance = round(
+            current_balance + total_receivable - total_payable, 2
+        )
+        format_total_balance = f'R$ {total_balance:.2f}'
+        color = 'red' if total_balance < 0 else 'green'
 
-    click.echo(click.style(division, fg=color, bold=True))
+        click.echo(click.style(division, fg=color, bold=True))
+        
+        txt = click.style(
+            f'RESULT{format_total_balance:>44}',
+            fg=color,
+            bold=True
+        )
+        click.echo(txt)
 
-    format_total_balance = f'R$ {total_balance:.2f}'
-    txt = click.style(f'RESULT{format_total_balance:>44}', fg=color, bold=True)
-    click.echo(txt)
-
-    click.echo(click.style(division, fg=color, bold=True))
+        click.echo(click.style(division, fg=color, bold=True))

@@ -1,11 +1,12 @@
 import depoc
 import click
 import sys
+import time
 
 from typing import Any
 
 from ..utils._response import _handle_response
-from ..utils._format import _format_response
+from ..utils._format import _format_response, spinner
 
 
 client = depoc.DepocClient()
@@ -87,8 +88,8 @@ def update(id: str, name: str, parent: str, activate: bool) -> None:
         _format_response(obj, 'UPDATED', highlight, color='green')
 
 @category.command
-@click.argument('id')
-def delete(id: str) -> None:
+@click.argument('ids', nargs=-1)
+def delete(ids: str) -> None:
     ''' Delete a category '''
     service = client.financial_categories.delete
 
@@ -100,5 +101,10 @@ def delete(id: str) -> None:
         elif confirmation == 'y':
             break
 
-    if obj := _handle_response(service, resource_id=id):
-        _format_response(obj, 'DEACTIVATED', 'Done', color='red')
+    if len(ids) > 1:
+        spinner()
+
+    for id in ids:
+        time.sleep(0.5)
+        if obj := _handle_response(service, resource_id=id):
+            _format_response(obj, 'DELETED', 'Done', color='red')
