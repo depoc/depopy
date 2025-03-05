@@ -16,6 +16,9 @@ def report(ctx, date: str, start_date: str, end_date: str) -> None:
     ''' Financial report for a specific period. '''
     division = f'{'':->50}'
 
+    if start_date and end_date:
+        date = ''
+
     current_balance: float = 0
     total_receivable: float = 0
     total_payable: float = 0
