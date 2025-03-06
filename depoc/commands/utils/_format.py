@@ -34,6 +34,8 @@ def _format_response(
     header = click.style(f'\n{header:>50}', bold=True)
 
     if highlight:
+        if len(highlight) > 50:
+            highlight = highlight[:50] if len(highlight) > 50 else None
         highlight = click.style(f'\n{highlight:>50}', bold=True)
 
     data = obj.to_dict()
