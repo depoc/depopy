@@ -9,6 +9,8 @@ from .commands import contact
 from .commands import receivable
 from .commands import payable
 from .commands import report
+from .commands import customer
+from .commands import supplier
 
 @click.group()
 def main() -> None:
@@ -25,3 +27,5 @@ main.add_command(contact)
 main.add_command(receivable)
 main.add_command(payable)
 main.add_command(report)
+main.add_command(customer)
+main.add_command(supplier)
