@@ -11,6 +11,8 @@ from .commands import payable
 from .commands import report
 from .commands import customer
 from .commands import supplier
+from .commands import owner
+from .commands import balance
 
 @click.group()
 def main() -> None:
@@ -29,3 +31,5 @@ main.add_command(payable)
 main.add_command(report)
 main.add_command(customer)
 main.add_command(supplier)
+main.add_command(owner)
+main.add_command(balance)

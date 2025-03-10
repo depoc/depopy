@@ -18,6 +18,9 @@ def report(ctx, date: str, start_date: str, end_date: str) -> None:
 
     if start_date and end_date:
         date = ''
+        click.echo(f'{start_date +  ' - ' + end_date:>50}')
+    else:
+        click.echo(f'\n{date.upper():>50}')
 
     current_balance: float = 0
     total_receivable: float = 0

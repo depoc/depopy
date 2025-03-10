@@ -76,7 +76,7 @@ def create() -> None:
 
     if obj := _handle_response(service, data):
         title = f'\n{obj.contact}'
-        header = f'R$ {obj.total_amount}'
+        header = f'R$ {obj.outstanding_balance}'
         highlight = f'{obj.status.upper()}'
         _format_response(obj, title, header, highlight)
 
@@ -88,7 +88,7 @@ def get(id: str) -> None:
 
     if obj := _handle_response(service, resource_id=id):
         title = f'\n{obj.contact}'
-        header = f'R$ {obj.total_amount}'
+        header = f'R$ {obj.outstanding_balance}'
         highlight = f'{obj.status.upper()}'
         _format_response(obj, title, header, highlight)
 
@@ -116,7 +116,7 @@ def all(limit: int, page: int, detailed: bool) -> None:
         for obj in results:
             total_payable += float(obj.outstanding_balance)
             title = f'\n{obj.contact}'
-            header = f'R$ {obj.total_amount}'
+            header = f'R$ {obj.outstanding_balance}'
             highlight = f'{obj.status.replace('_', ' ').upper()}'
 
             remove = [] if detailed else \
@@ -168,7 +168,7 @@ def update(
     service = client.payables.update
 
     if obj := _handle_response(service, data, resource_id=id):
-        header = f'R$ {obj.total_amount}'
+        header = f'R$ {obj.outstanding_balance}'
         highlight = f'{obj.status.upper()}'
         _format_response(obj, 'UPDATED', header, highlight, color='green')
 
@@ -274,7 +274,7 @@ def filter(
         for obj in results:
             total_payable += float(obj.outstanding_balance)
             title = f'\n{obj.contact}'
-            header = f'R$ {obj.total_amount}'
+            header = f'R$ {obj.outstanding_balance}'
             highlight = f'{obj.status.replace('_', ' ').upper()}'
 
             remove = [] if detailed else \
