@@ -24,7 +24,6 @@ config_dir = user_data_dir(APP_NAME)
 os.makedirs(config_dir, exist_ok=True)
 token_path = os.path.join(config_dir, 'token.json')
 
-
 token: str | None = None
 
 try:
