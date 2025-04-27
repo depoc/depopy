@@ -12,6 +12,16 @@ def _handle_response(
         resource_id: str | None = None,
         **params,
     ) -> DepocObject | None:
+    '''
+    Handles the response for a service method call.
+
+    The `service` argument should be a method of a
+    resourcein the DepocClient instance.
+
+    Examples of valid service methods:
+    - `client.customer.create` 
+    - `client.receivable.all`
+    '''
     try:
         if data and resource_id:
             response = service(data, resource_id)
@@ -21,7 +31,9 @@ def _handle_response(
             response = service(resource_id)
         else:
             response = service(**params)
+
         return response
+    
     except APIError as e:
         click.echo(str(e))
     return None
