@@ -28,7 +28,7 @@ def create(name: str, parent: str) -> None:
     service = client.financial_categories.create
 
     if obj := _handle_response(service, data):
-        highlight = f'{obj.parent.name}' if obj.parent.name else ''
+        highlight = f'{obj.parent.name}' if obj.parent else ''
         _format_response(obj, obj.name, highlight)
 
 @category.command
@@ -38,7 +38,7 @@ def get(id: str) -> None:
     service = client.financial_categories.get
 
     if obj := _handle_response(service, resource_id=id):
-            highlight = f'{obj.parent.name}' if obj.parent.name else ''
+            highlight = f'{obj.parent.name}' if obj.parent else ''
             _format_response(obj, obj.name, highlight)
 
 @category.command
@@ -59,7 +59,7 @@ def all(limit: int, page: int, oneline: bool) -> None:
             click.echo(f'For next page: --page <number>')
 
         for obj in response.results:
-            highlight = f'{obj.parent.name}' if obj.parent.name else ''
+            highlight = f'{obj.parent.name}' if obj.parent else ''
             remove = ['name', 'is_active', 'parent']
 
             if oneline:

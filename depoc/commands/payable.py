@@ -96,22 +96,27 @@ def get(id: str) -> None:
 @click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
 @click.option('-d', '--detailed', is_flag=True)
-def all(limit: int, page: int, detailed: bool) -> None:
+@click.option('-u', 'unpaid', is_flag=True)
+def all(limit: int, page: int, detailed: bool, unpaid: bool) -> None:
     ''' Retrieve all payables. '''
     service = client.payables.all
 
     total_payable: float = 0
 
     if response := _handle_response(service, limit=limit, page=page):
-        click.echo(f'\nResults: {response.count}')
-        if limit < response.count:
-            click.echo(
-                f'Showing: {len(response.results)} out of {response.count}'
-            ) 
-        if response.next:
-            click.echo(f'For next page: --page <number>')
-
         results = sorted(response.results, key=lambda obj: obj.due_at)
+
+        if unpaid:
+            results = [obj for obj in results if obj.status != 'paid']
+            click.echo(f'\nResults: {len(results)}')
+        elif not unpaid:
+            click.echo(f'\nResults: {response.count}')
+            if limit < response.count:
+                click.echo(
+                    f'Showing: {len(response.results)} out of {response.count}'
+                ) 
+            if response.next:
+                click.echo(f'For next page: --page <number>')
 
         for obj in results:
             total_payable += float(obj.outstanding_balance)
@@ -121,7 +126,7 @@ def all(limit: int, page: int, detailed: bool) -> None:
 
             remove = [] if detailed else \
             [item for item in obj.to_dict().keys() if item in fields]
-
+            
             _format_response(obj, title, header, highlight, remove=remove)
 
         division = click.style(f'\n{'':-<49}', bold=True)
