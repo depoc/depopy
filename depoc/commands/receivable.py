@@ -239,6 +239,7 @@ def settle(id: str, amount: float, account: str) -> None:
 @click.option('-ed', '--end-date')
 @click.option('-l', '--limit', default=50)
 @click.option('--detailed', is_flag=True)
+@click.option('-u', '--unpaid', is_flag=True)
 @click.pass_context
 def filter(
     ctx,
@@ -248,6 +249,7 @@ def filter(
     end_date: str,
     limit: int,
     detailed: bool,
+    unpaid: bool,
     ) -> None:
     ''' Filter receivables. '''
     if not any([search, date, start_date, end_date]):
@@ -265,16 +267,19 @@ def filter(
         end_date=end_date,
         limit=limit,
     ):
-        click.echo(f'\nResults: {response.count}')
-        click.echo(f'\nResults: {response.count}')
-        if limit < response.count:
-            click.echo(
-                f'Showing: {len(response.results)} out of {response.count}'
-            ) 
-        if response.next:
-            click.echo(f'For next page: --page <number>')
-
         results = sorted(response.results, key=lambda obj: obj.due_at)
+
+        if unpaid:
+            results = [obj for obj in results if obj.status != 'paid']
+            click.echo(f'\nResults: {len(results)}')
+        elif not unpaid:
+            click.echo(f'\nResults: {response.count}')
+            if limit < response.count:
+                click.echo(
+                    f'Showing: {len(response.results)} out of {response.count}'
+                ) 
+            if response.next:
+                click.echo(f'For next page: --page <number>')
 
         for obj in results:
             total_receivable += float(obj.outstanding_balance)
