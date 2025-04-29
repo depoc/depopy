@@ -2,6 +2,7 @@ import click
 import sys
 import itertools
 import time
+import math
 
 from typing import Literal
 
@@ -71,3 +72,20 @@ def spinner() -> None:
         sys.stdout.flush()
         time.sleep(0.1)
     click.echo('')
+
+
+def page_summary(response: DepocObject):
+    total_pages = math.ceil(response.count / 50)
+    results_count = len(response.results)
+    current_page_number = 1
+
+    click.echo(f'\nResults: {response.count}')
+
+    if response.next:
+        next_page_number = response.next[-1]
+        current_page_number = int(next_page_number) - 1
+    elif response.previous and not response.next:
+        current_page_number = total_pages
+
+    click.echo(f'Page {current_page_number} out of {total_pages}')
+    click.echo(f'Showing {results_count} results on page {current_page_number}')

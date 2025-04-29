@@ -7,7 +7,7 @@ from typing import Any
 from datetime import datetime
 
 from .utils._response import _handle_response
-from .utils._format import _format_response, spinner
+from .utils._format import _format_response, spinner, page_summary
 
 
 client = depoc.DepocClient()
@@ -110,14 +110,8 @@ def all(limit: int, page: int, detailed: bool, unpaid: bool) -> None:
             results = [obj for obj in results if obj.status != 'paid']
             click.echo(f'\nResults: {len(results)}')
         elif not unpaid:
-            click.echo(f'\nResults: {response.count}')
-            if limit < response.count:
-                click.echo(
-                    f'Showing: {len(response.results)} out of {response.count}'
-                ) 
-            if response.next:
-                click.echo(f'For next page: --page <number>')
-
+            page_summary(response)
+    
         for obj in results:
             total_payable += float(obj.outstanding_balance)
             title = f'\n{obj.contact}'
@@ -274,13 +268,7 @@ def filter(
             results = [obj for obj in results if obj.status != 'paid']
             click.echo(f'\nResults: {len(results)}')
         elif not unpaid:
-            click.echo(f'\nResults: {response.count}')
-            if limit < response.count:
-                click.echo(
-                    f'Showing: {len(response.results)} out of {response.count}'
-                ) 
-            if response.next:
-                click.echo(f'For next page: --page <number>')
+            page_summary(response)
 
         for obj in results:
             total_payable += float(obj.outstanding_balance)
