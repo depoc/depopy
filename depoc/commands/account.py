@@ -3,7 +3,7 @@ import click
 import sys
 
 from .utils._response import _handle_response
-from .utils._format import _format_response
+from .utils._format import _format_profile
 
 
 client = depoc.DepocClient()
@@ -15,9 +15,9 @@ def account() -> None:
     pass
 
 @account.command
-@click.option('--name')
-@click.option('--email')
-@click.option('--username')
+@click.option('-n', '--name')
+@click.option('-e', '--email')
+@click.option('-u', '--username')
 def update(name: str, email: str, username: str) -> None:
     data = {}
     data.update({'name': name}) if name else None
@@ -27,7 +27,7 @@ def update(name: str, email: str, username: str) -> None:
     service = client.accounts.update
 
     if obj := _handle_response(service, data):
-        _format_response(obj, obj.name, f'@{obj.username}')
+        _format_profile(obj, '[green]UPDATED', update=True)
 
 @account.command
 def delete() -> None:
@@ -42,4 +42,4 @@ def delete() -> None:
             break
 
     if obj := _handle_response(service):
-        _format_response(obj, 'DEACTIVATED', 'Done', color='red')
+        _format_profile(obj, '[red]DEACTIVATED', delete=True)

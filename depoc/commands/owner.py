@@ -4,24 +4,21 @@ import click
 from typing import Any
 
 from .utils._response import _handle_response
-from .utils._format import _format_response
+from .utils._format import _format_profile
 
 
 client = depoc.DepocClient()
 
 
-@click.group
-def owner() -> None:
+@click.group(invoke_without_command=True)
+@click.pass_context
+def owner(ctx) -> None:
     ''' Owner - retrieve and update. '''
-    pass
+    if ctx.invoked_subcommand is None:
+        service = client.owner.get
 
-@owner.command
-def get() -> None:
-    ''' Retrive owner. '''
-    service = client.owner.get
-
-    if obj := _handle_response(service):
-        _format_response(obj, obj.name, obj.email)
+        if obj := _handle_response(service):
+            _format_profile(obj, 'OWNER PROFILE')
 
 @owner.command
 @click.option('-n', '--name')
@@ -37,4 +34,4 @@ def update(name: str, email: str, phone: str) -> None:
     service = client.owner.update
 
     if obj := _handle_response(service, data):
-        _format_response(obj, obj.name, obj.email)
+        _format_profile(obj, '[green]UPDATED', update=True)

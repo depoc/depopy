@@ -1,8 +1,12 @@
 import depoc
 import click
 
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
 from .utils._response import _handle_response
-from .utils._format import _format_response
+from .utils._format import _format_profile
 
 
 client = depoc.DepocClient()
@@ -14,6 +18,4 @@ def me() -> None:
     service = client.me.get
 
     if obj := _handle_response(service):
-        title = f'Welcome {obj.name}'
-        header = f'@{obj.username}'
-        _format_response(obj, title, header, obj.email)
+        _format_profile(obj, 'USER PROFILE')
