@@ -19,7 +19,7 @@ setup(
         'requests >= 2.32.3',
         'click  >= 8.1.8',
         'appdirs >= 1.4.4',
-        'rich >= 13.9.4',
+        'rich >= 13.9.4', 
     ],
     entry_points={
         'console_scripts': [
