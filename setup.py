@@ -8,7 +8,7 @@ LONG_DESCRIPTION: str = (
 
 setup(
     name='depoc',
-    version='0.1.3a6', 
+    version='0.1.3a7', 
     description='Python bindings for the Depoc API',
     long_description=LONG_DESCRIPTION,
     author='Hugo Belém',
@@ -19,6 +19,7 @@ setup(
         'requests >= 2.32.3',
         'click  >= 8.1.8',
         'appdirs >= 1.4.4',
+        'rich >= 13.9.4',
     ],
     entry_points={
         'console_scripts': [
