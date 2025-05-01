@@ -4,172 +4,180 @@ import sys
 import time
 
 from typing import Any
-from datetime import datetime
+
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
 
 from .utils._response import _handle_response
-from .utils._format import _format_response, spinner, page_summary
-
-
-client = depoc.DepocClient()
-
-
-fields = (
-    'contact',
-    'issued_at',
-    'updated_at',
-    'payment_type',
-    'installment_count',
-    'due_weekday',
-    'due_day_of_month',
-    'reference',
-    'recurrence',
-    'status',
-    'notes',
+from .utils._format import (
+    spinner,
+    page_summary,
+    _format_payments,
+    _format_transactions,
 )
 
 
-@click.group
-def receivable() -> None:
+client = depoc.DepocClient()
+console = Console()
+
+
+@click.group(invoke_without_command=True)
+@click.option('-l', '--limit', default=50)
+@click.option('-p', '--page', default=0)
+@click.option('--all', is_flag=True)
+@click.option('--detail', is_flag=True)
+@click.pass_context
+def receivable(
+    ctx,
+    limit: int,
+    page: int,
+    all: bool = False,
+    detail: bool = False
+) -> None:
     ''' Manage receivables. '''
-    pass
+    if ctx.invoked_subcommand is None:
+        service = client.receivables.all
+
+        if not all and limit != 50: 
+            console.print((
+                '🚨 [bold][-l][/bold] & [bold][--limit][/bold] requires '
+                'the [yellow]--all[/yellow] flag.'
+            ))
+            sys.exit()
+
+        if not all and page > 0: 
+            console.print((
+                '🚨 [bold][-p][/bold] & [bold][--page][/bold] requires '
+                'the [yellow]--all[/yellow] flag.'
+            ))
+            sys.exit()
+
+        if response := _handle_response(service, limit=limit, page=page):
+            results = sorted(response.results, key=lambda obj: obj.due_at)
+
+            if not all:
+                results = [obj for obj in results if obj.status != 'paid']
+                results_count = len(results)
+
+                # This page summary data needs to be
+                # reviewed to accommodate different cases
+                click.echo((
+                    f'\n[Page {1}/{1}] '
+                    f'Showing {results_count} results '
+                    f'(Total: {results_count})\n'
+                ))
+                console.rule(
+                    '[bold]OUTSTANDING RECEIVABLES',
+                    align='center',
+                    style='bold',
+                )
+            else:
+                page_summary(response)
+                console.rule('ALL RECEIVABLES', align='center', style='none')
+            
+            console.print('')
+
+            total_receivable: float = 0
+            for obj in results:
+                total_receivable += float(obj.outstanding_balance)             
+                _format_payments(obj, obj.contact, detail=detail)
+
+            click.echo(click.style(f'\n{'':-<49}', bold=True))
+            format_total = f'[yellow]R${total_receivable:,.2f}'
+            message = f'\n{'[bold]💵 Total to be received: ' + format_total}\n'
+            console.print(message)
 
 @receivable.command
 def create() -> None:
     ''' Create receivable. '''
-
-    click.echo(f'\n{'ADD NEW RECEIVABLE':-<50}')
+    panel = Panel('[bold]+ ADD NEW RECEIVABLE')
+    console.print(panel)
 
     data: dict[str, Any] = {}
-    data.update({'total_amount': input('Total Amount: R$')})
-    data.update({'due_at': input('Due At: ')})
-    data.update({'issued_at': input('Issued At: ')})
-    data.update({'payment_method': input('Payment Method: ')})
+    data.update({'total_amount': Prompt.ask('💰 Total Amount R$', default=None)})
+    console.rule('',style=None, align='left')
+    data.update({'due_at': Prompt.ask('📅 Due At', default=None)})
+    console.rule('',style=None, align='left')
+    data.update({'issued_at': Prompt.ask('📅 Issued At', default=None)})
+    console.rule('',style=None, align='left')
+    data.update({'payment_method': Prompt.ask('💳 Payment Method', default=None)})
+    console.rule('',style=None, align='left')
+    recurrence = Prompt.ask('⏳ Recurrence', default=None, choices=['once', 'weekly', 'monthly', 'installments'])
+    data.update({'recurrence': recurrence})
+    console.rule('',style=None, align='left')
 
-    while True:
-        click.echo('\n• Once \n• Weekly \n• Monthly \n• Installments')
-        recurrence = input('- Recurrence: ').strip().lower()
+    if recurrence == 'monthly':
+        console.rule('',style=None, align='left')
+        data.update({'due_day_of_month': Prompt.ask('📆 Due Day of Month', default=None)})
+    elif recurrence == 'weekly':
+        console.rule('',style=None, align='left')
+        data.update({'due_weekday': Prompt.ask('📆 Due Weekday', default=None)})
+    elif recurrence == 'installments':
+        console.rule('',style=None, align='left')
+        data.update({'installment_count': Prompt.ask('⏰ Installments', default=None)})
+        console.rule('',style=None, align='left')
+        data.update({'due_day_of_month': Prompt.ask('📆 Due Day of Month', default=None)})
 
-        if recurrence in ('once', 'monthly', 'weekly', 'installments'):
-            data.update({'recurrence': recurrence})
-            if recurrence == 'monthly':
-                data.update({'due_day_of_month': input('- Due Day of Month: ')})
-            elif recurrence == 'weekly':
-                data.update({'due_weekday': input('- Due Weekday: ')})
-            elif recurrence == 'installments':
-                data.update({'installment_count': input('- Installments: ')})
-            break
 
-        message = click.style(
-            '\nPlease choose a valid recurrence type.',
-            fg='red'
-        )
-        click.echo(message)
-
-    data.update({'category': input('\nCategory ID: ')})
-    data.update({'contact': input('Contact ID: ')})
-    data.update({'reference': input('Reference Number: ')})
-    data.update({'notes': input('Notes: ')})
-
-    click.echo(f'{'':-<50}')
+    data.update({'category': Prompt.ask('📂 Category ID', default=None)})
+    console.rule('',style=None, align='left')
+    data.update({'contact': Prompt.ask('🆔 Contact ID', default=None)})
+    console.rule('',style=None, align='left')
+    data.update({'reference': Prompt.ask('📎 Reference Number', default=None)})
+    console.rule('',style=None, align='left')
+    data.update({'notes': Prompt.ask('🗒️ Notes', default=None)})
+    console.rule('',style=None, align='left')
 
     service = client.receivables.create
 
     if obj := _handle_response(service, data):
-        title = f'\n{obj.contact}'
-        header = f'R$ {obj.outstanding_balance}'
-        highlight = f'{obj.status.upper()}'
-        _format_response(obj, title, header, highlight)
+        _format_payments(obj, obj.contact, detail=True)
 
 @receivable.command
 @click.argument('id')
 def get(id: str) -> None:
     ''' Retrieve an specific receivable. '''
     service = client.receivables.get
-
     if obj := _handle_response(service, resource_id=id):
-        title = f'\n{obj.contact}'
-        header = f'R$ {obj.outstanding_balance}'
-        highlight = f'{obj.status.upper()}'
-        _format_response(obj, title, header, highlight)
-
-@receivable.command
-@click.option('-l', '--limit', default=50)
-@click.option('-p', '--page', default=0)
-@click.option('-d', '--detailed', is_flag=True)
-@click.option('-u', 'unpaid', is_flag=True)
-def all(limit: int, page: int, detailed: bool, unpaid: bool) -> None:
-    ''' Retrieve all receivables. '''
-    service = client.receivables.all
-
-    total_receivable: float = 0
-
-    if response := _handle_response(service, limit=limit, page=page):
-        results = sorted(response.results, key=lambda obj: obj.due_at)
-
-        if unpaid:
-            results = [obj for obj in results if obj.status != 'paid']
-            click.echo(f'\nResults: {len(results)}')
-        elif not unpaid:
-            page_summary(response)
-
-        for obj in results:
-            total_receivable += float(obj.outstanding_balance)
-            title = f'\n{obj.contact}'
-            header = f'R$ {obj.outstanding_balance}'
-            highlight = f'{obj.status.replace('_', ' ').upper()}'
-
-            remove = [] if detailed else \
-            [item for item in obj.to_dict().keys() if item in fields]
-
-            _format_response(obj, title, header, highlight, remove=remove)
-
-        division = click.style(f'\n{'':-<49}', bold=True)
-        click.echo(division)
-        format_total_receivable = f'R$ {total_receivable:.2f}'
-        txt = f'\n{'Total to be received: ' + format_total_receivable:>50}\n'
-        click.echo(txt)
+        _format_payments(obj, obj.contact, detail=True)
 
 @receivable.command
 @click.argument('id')
-@click.option('-ct', '--contact')
-@click.option('-cg', '--category')
-@click.option('-ia', '--issued-at')
-@click.option('-da', '--due-at')
-@click.option('-pa', '--paid-at')
+@click.option('-c', '--contact')
+@click.option('-i', '--issued-at')
+@click.option('-d', '--due-at')
 @click.option('-t', '--total-amount')
-@click.option('-pm', '--payment-method')
+@click.option('-p', '--payment-method')
 @click.option('-r', '--reference')
 @click.option('-n', '--notes')
+@click.option('--category')
 def update(
     id: str,
     contact: str,
     category: str,
     issued_at: str,
     due_at: str,
-    paid_at: str,
     total_amount: float,
     payment_method: str,
     reference: str,
     notes: str,
     ) -> None:
-    ''' Update an specific receivable. '''
+    ''' Update an specific payable. '''
+    # Bug to fix: unable to update a field to an empty value
     data: dict[str, Any] = {}
     data.update({'contact': contact}) if contact else None
     data.update({'category': category}) if category else None
     data.update({'issued_at': issued_at}) if issued_at else None
     data.update({'due_at': due_at}) if due_at else None
-    data.update({'paid_at': paid_at}) if paid_at else None
     data.update({'total_amount': total_amount}) if total_amount else None
     data.update({'payment_method': payment_method}) if payment_method else None
     data.update({'reference': reference}) if reference else None
     data.update({'notes': notes}) if notes else None
 
     service = client.receivables.update
-
     if obj := _handle_response(service, data, resource_id=id):
-        header = f'R$ {obj.outstanding_balance}'
-        highlight = f'{obj.status.upper()}'
-        _format_response(obj, 'UPDATED', header, highlight, color='green')
+        _format_payments(obj, 'UPDATED', update=True, detail=True)
 
 @receivable.command
 @click.argument('ids', nargs=-1)
@@ -191,7 +199,7 @@ def delete(ids: str) -> None:
     for id in ids:
         time.sleep(0.5)
         if obj := _handle_response(service, resource_id=id):
-            _format_response(obj, 'DELETED', 'Done', color='red')
+            console.print('✅ Receivable deleted')
 
 @receivable.command
 @click.argument('id')
@@ -204,53 +212,29 @@ def settle(id: str, amount: float, account: str) -> None:
     service = client.receivable_settle.create
 
     if obj := _handle_response(service, data, id):
-        header = f'R$ {obj.amount}'
-        title = f'{obj.account.name} {obj.type}'
-        timestamp = datetime.fromisoformat(obj.timestamp)
-        obj.timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        remove = [
-            'type',
-            'description',
-            'amount',
-            'payment',
-            'linked',
-            'account',
-            'operator',
-        ]
-
-        _format_response(
-            obj=obj,
-            title=title,
-            header=header,
-            highlight=obj.description,
-            remove=remove
-        )
+        title = f'\n{obj.account.name} {obj.type}'.upper()
+        _format_transactions(obj, title)
 
 @receivable.command
-@click.option('-s', '--search')
+@click.argument('search', required=False)
 @click.option('-d', '--date')
-@click.option('-sd', '--start-date')
-@click.option('-ed', '--end-date')
+@click.option('-s', '--start-date')
+@click.option('-e', '--end-date')
 @click.option('-l', '--limit', default=50)
-@click.option('--detailed', is_flag=True)
-@click.option('-u', '--unpaid', is_flag=True)
 @click.pass_context
-def filter(
+def search(
     ctx,
     search: str,
     date: str,
     start_date: str,
     end_date: str,
     limit: int,
-    detailed: bool,
-    unpaid: bool,
     ) -> None:
     ''' Filter receivables. '''
     if not any([search, date, start_date, end_date]):
         click.echo(ctx.get_help())
         sys.exit(0)
 
-    total_receivable: float = 0
     service = client.receivables.filter
 
     if response := _handle_response(
@@ -263,25 +247,14 @@ def filter(
     ):
         results = sorted(response.results, key=lambda obj: obj.due_at)
 
-        if unpaid:
-            results = [obj for obj in results if obj.status != 'paid']
-            click.echo(f'\nResults: {len(results)}')
-        elif not unpaid:
-            page_summary(response)
+        page_summary(response)
 
+        total_receivable: float = 0
         for obj in results:
             total_receivable += float(obj.outstanding_balance)
-            title = f'\n{obj.contact}'
-            header = f'R$ {obj.outstanding_balance}'
-            highlight = f'{obj.status.replace('_', ' ').upper()}'
+            _format_payments(obj, obj.contact)
 
-            remove = [] if detailed else \
-            [item for item in obj.to_dict().keys() if item in fields]
-
-            _format_response(obj, title, header, highlight, remove=remove)
-
-        division = click.style(f'\n{'':-<49}', bold=True)
-        click.echo(division)
-        format_total_receivable = f'R$ {total_receivable:.2f}'
-        txt = f'\n{'Total to be received: ' + format_total_receivable:>50}\n'
-        click.echo(txt)
+        click.echo(click.style(f'\n{'':-<49}', bold=True))
+        format_total = f'[yellow]R${total_receivable:,.2f}'
+        message = f'\n{'[bold]💵 Total to be received: ' + format_total}\n'
+        console.print(message)

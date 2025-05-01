@@ -4,6 +4,8 @@ import itertools
 import time
 import math
 
+from datetime import datetime
+
 from rich.console import Console, Group
 from rich.panel import Panel
 from rich.table import Table
@@ -38,7 +40,204 @@ emojis = {
     'Number Of Orders': '🛒',
     'Created At': '📅',
     'Updated At': '🕒',
+    'Category': '📂',
+    'Issued At': '📅',
+    'Due At': '📅',
+    'Paid At': '📅',
+    'Updated At': '🕒',
+    'Total Amount': '💰',
+    'Amount Paid': '💸',
+    'Outstanding Balance': '💵',
+    'Payment Type': '🏧',
+    'Payment Method': '💳',
+    'Status': '🟢',
+    'Recurrence': '⏳',
+    'Installment Count': '⏰',
+    'Due Weekday': '📆',
+    'Due Day Of Month': '📆',
+    'Reference': '📎',
 }
+
+def _format_transactions(
+        obj: DepocObject,
+        title: str,
+        update: bool = False,
+        detail: bool = False
+    ):
+
+    timestamp = datetime.fromisoformat(obj.timestamp)
+    obj.timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+
+    table = Table(
+        show_header=True,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=f'R${float(obj.amount):,.2f}',
+        caption=obj.timestamp,
+        title_justify='right',
+    )
+
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='right', no_wrap=True)
+
+    data = obj.to_dict()
+    data.pop('id', None)
+    data.pop('description', None)
+    data.pop('timestamp', None)
+    data.pop('type', None)
+    data.pop('account', None)
+    data.pop('amount', None)
+
+    if not detail:
+        data.pop('operator', None)
+        data.pop('linked', None)
+
+    for k, v in data.items():
+        k = k.replace('_', ' ').title()
+        k = k.replace('Is ', '')
+        k = k.upper() if k in ('Cpf', 'Cnpj', 'Ie', 'Im') else k
+
+        if isinstance(v, DepocObject):
+            if hasattr(v, 'name'):
+                v = v.name
+        
+        if v:
+            table.add_row(f'{k}: ', f'{v}')
+    
+    description = Table(
+        show_header=False,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=obj.description,
+        title_justify='center',
+    )
+    description.add_column('', justify='left', no_wrap=True)
+    
+    group = Group(table, description)
+
+    style = 'none'
+    panel_title = f'{title}'
+    subtitle = f'[bold]{obj.id}'
+    border_style = 'none'
+
+    if update:
+        style = 'green'
+        panel_title = f'[bold][green]{title}'
+        subtitle = f'[green]{obj.id}'
+        border_style = 'none'
+    elif obj.type == 'credit':
+        border_style = 'green'
+    elif obj.type == 'debit':
+        border_style = 'red'
+
+    profile = Panel(
+        group,
+        title=panel_title,
+        title_align='left', 
+        subtitle=subtitle,
+        subtitle_align='left',
+        style=style,
+        border_style=border_style,
+    )
+
+    console.print(profile)
+
+
+
+def _format_payments(
+        obj: DepocObject,
+        title: str,
+        update: bool = False,
+        detail: bool = False
+    ):
+
+    table_title = f'[bold]R${float(obj.outstanding_balance):,.2f}'
+
+    table = Table(
+        show_header=True,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=table_title,
+        caption=f'{obj.due_at}',
+        title_justify='right',
+        caption_justify='center'
+    )
+
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='left', no_wrap=True)
+
+    data = obj.to_dict()
+    data.pop('id', None)
+    data.pop('notes', None)
+    data.pop('contact', None)
+    data.pop('payment_type', None)
+
+    if not detail:
+        data.pop('status', None)
+        data.pop('due_at', None)
+        data.pop('updated_at', None)
+        data.pop('payment_method', None)
+        data.pop('recurrence', None)
+        data.pop('reference', None)
+
+    for k, v in data.items():
+        if k in 'updated_at':
+            v = v[:10] if v is not None else 'null'
+
+        k = k.replace('_', ' ').title()
+        k = k.replace('Is ', '')
+        k = k.upper() if k in ('Cpf', 'Cnpj', 'Ie', 'Im') else k
+        
+        if v:
+            table.add_row(f'{emojis[k]} {k}: ', f'{v}')
+    
+    notes = Table(
+        show_header=False,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=obj.notes,
+        title_justify='center',
+    )
+    notes.add_column('', justify='left', no_wrap=True)
+    
+    group = Group(table, notes)
+
+    style = 'none'
+    panel_title = f'[bold]{title}'
+    subtitle = f'[bold]{obj.id}'
+    border_style = 'none'
+
+    if update:
+        style = 'green'
+        panel_title = f'[bold][green]{title}'
+        subtitle = f'[green]{obj.id}'
+        border_style = 'none'
+    elif obj.status == 'overdue':
+        style = 'none'
+        panel_title = f'[bold]{title}'
+        subtitle = f'[bold]{obj.id}'
+        border_style = 'red'
+    elif obj.status == 'paid':
+        style = 'none'
+        panel_title = f'[bold]{title}'
+        subtitle = f'[bold]{obj.id}'
+        border_style = 'green'
+
+    profile = Panel(
+        group,
+        title=panel_title,
+        title_align='left', 
+        subtitle=subtitle,
+        subtitle_align='left',
+        style=style,
+        border_style=border_style,
+    )
+
+    console.print(profile)
 
 
 def _format_contact(
@@ -124,7 +323,6 @@ def _format_contact(
     )
 
     console.print(profile)
-
 
 
 def _format_profile(

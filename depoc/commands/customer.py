@@ -21,9 +21,9 @@ console = Console()
 @click.pass_context
 @click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
-def customer(cxt, limit: int, page: int) -> None:
+def customer(ctx, limit: int, page: int) -> None:
     ''' Manage customers. '''
-    if cxt.invoked_subcommand is None:
+    if ctx.invoked_subcommand is None:
         service = client.customers.all
         
         if response := _handle_response(service, limit=limit, page=page):
@@ -111,6 +111,7 @@ def update(
     activate: bool,
     ) -> None:
     ''' Update an specific customer. '''
+    # unable to update a field to an empty value
     data: dict[str, Any] = {}
     data.update({'code': code}) if code else None
     data.update({'name': name}) if name else None

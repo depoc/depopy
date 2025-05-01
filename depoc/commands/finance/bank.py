@@ -1,17 +1,69 @@
 import depoc
 import click
 
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
 from ..utils._response import _handle_response
-from ..utils._format import _format_response
 
 
 client = depoc.DepocClient()
+console = Console()
+
+def _format_bank(obj, update: bool = False):
+    table = Table(
+        show_header=False,
+        show_footer=True,
+        box=None,
+        expand=True,
+        caption=f'{obj.id}',
+        caption_justify='left'
+        )
+    
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='right', no_wrap=True)
+    balance = float(obj.balance)
+    table.add_row(f'', f'[bold]R${balance:,.2f}')
+
+    if update:
+        border_style = 'green'
+    elif not obj.is_active:
+        border_style = 'red'
+    else:
+        border_style = 'none'
+
+    panel = Panel(
+        table,
+        title=f'[bold]💰 {obj.name.upper()}',
+        title_align='left',
+        border_style=border_style,
+    )
+
+    console.print(panel)
 
 
-@click.group
-def bank() -> None:
+@click.group(invoke_without_command=True)
+@click.pass_context
+def bank(ctx) -> None:
     ''' Manage bank accounts '''
-    pass
+    if ctx.invoked_subcommand is None:
+        service = client.financial_accounts.all
+        total_balance: float = 0
+        if response := _handle_response(service):
+            results = sorted(
+                 response.results,
+                 key=lambda result : result.balance,
+                 reverse=True,
+            )
+
+            for obj in results:
+                total_balance += float(obj.balance)
+                _format_bank(obj)
+
+            format_total_balance = f'R${total_balance:,.2f}'
+            message = f'\n{'💵 Total Balance: ' + format_total_balance}\n'
+            click.echo(message)
 
 @bank.command
 @click.argument('name')
@@ -21,8 +73,7 @@ def create(name: str) -> None:
     service = client.financial_accounts.create
 
     if obj := _handle_response(service, data):
-            highlight = f'R$ {obj.balance}'
-            _format_response(obj, obj.name, highlight)
+        _format_bank(obj)
 
 @bank.command
 @click.argument('id')
@@ -31,38 +82,24 @@ def get(id: str) -> None:
     service = client.financial_accounts.get
 
     if obj := _handle_response(service, resource_id=id):
-        highlight = f'R$ {obj.balance}'
-        _format_response(obj, obj.name, highlight)
-
-@bank.command
-def all() -> None:
-    ''' Retrieve all bank accounts. '''
-    service = client.financial_accounts.all
-
-    total_balance: float = 0
-
-    if response := _handle_response(service):
-        for obj in response.results:
-            total_balance += float(obj.balance)
-            highlight = f'R$ {obj.balance}'
-            remove = ['name', 'balance', 'created_at', 'is_active']
-            _format_response(obj, obj.name, highlight, remove=remove)
-
-        format_total_balance = f'R$ {total_balance:.2f}'
-        txt = f'\n{'Total Balance: ' + format_total_balance:>50}\n'
-        click.echo(txt)
+        _format_bank(obj)
 
 @bank.command
 @click.argument('id')
 @click.argument('name')
-def update(id: str, name: str) -> None:
+@click.option('-A', '--activate', is_flag=True)
+def update(id: str, name: str, activate: bool = False) -> None:
     ''' Update a bank account. '''
     data = {'name': name}
+
+    # I want to reactivate a bank without having to provide a name
+    if activate:
+        data.update({'is_active': True})
+
     service = client.financial_accounts.update
 
     if obj := _handle_response(service, data, id):
-            highlight = f'R$ {obj.balance}'
-            _format_response(obj, obj.name, highlight)
+        _format_bank(obj, update=True)
 
 @bank.command
 @click.argument('id')
@@ -70,5 +107,5 @@ def delete(id: str) -> None:
     ''' Delete a bank account. '''
     service = client.financial_accounts.delete
 
-    if obj := _handle_response(service, resource_id=id):
-        _format_response(obj, 'DEACTIVATED', 'Done', color='red')
+    if _handle_response(service, resource_id=id):
+        console.print('✅ Bank account inactivated')
