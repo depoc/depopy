@@ -10,9 +10,9 @@ client = depoc.DepocClient()
 
 @click.group(invoke_without_command=True)
 @click.pass_context
+@click.argument('search', required=False)
 @click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
-@click.option('-s', '--search')
 def contact(cxt, limit: int, page: int, search: str) -> None:
     ''' Contacts - retrieve all and filter. '''
     if cxt.invoked_subcommand is None:

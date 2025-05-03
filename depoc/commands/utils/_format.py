@@ -58,6 +58,37 @@ emojis = {
     'Reference': '📎',
 }
 
+
+def _format_category(obj, highlight: bool = False):
+    table = Table(
+        show_header=True,
+        show_footer=True,
+        box=None,
+        expand=True,
+        )
+    
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='right', no_wrap=True)
+
+    table.add_row(obj.name, obj.id)
+
+    border_style = 'none'
+    style = 'none'
+
+    if highlight:
+        border_style='green'
+        style='green'
+
+    profile = Panel(
+        table,
+        title_align='left',
+        subtitle_align='left',
+        border_style=border_style,
+        style=style,
+    )
+    console.print(profile)
+
+
 def _format_transactions(
         obj: DepocObject,
         title: str,

@@ -83,7 +83,6 @@ def receivable(
                 total_receivable += float(obj.outstanding_balance)             
                 _format_payments(obj, obj.contact, detail=detail)
 
-            click.echo(click.style(f'\n{'':-<49}', bold=True))
             format_total = f'[yellow]R${total_receivable:,.2f}'
             message = f'\n{'[bold]💵 Total to be received: ' + format_total}\n'
             console.print(message)
@@ -126,7 +125,7 @@ def create() -> None:
     console.rule('',style=None, align='left')
     data.update({'reference': Prompt.ask('📎 Reference Number', default=None)})
     console.rule('',style=None, align='left')
-    data.update({'notes': Prompt.ask('🗒️ Notes', default=None)})
+    data.update({'notes': Prompt.ask('🗒️  Notes', default=None)})
     console.rule('',style=None, align='left')
 
     service = client.receivables.create
