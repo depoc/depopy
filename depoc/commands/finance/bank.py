@@ -2,45 +2,13 @@ import depoc
 import click
 
 from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
 
 from ..utils._response import _handle_response
+from ..utils._format import _format_bank
 
 
 client = depoc.DepocClient()
 console = Console()
-
-def _format_bank(obj, update: bool = False):
-    table = Table(
-        show_header=False,
-        show_footer=True,
-        box=None,
-        expand=True,
-        caption=f'{obj.id}',
-        caption_justify='left'
-        )
-    
-    table.add_column('', justify='left', no_wrap=True)
-    table.add_column('', justify='right', no_wrap=True)
-    balance = float(obj.balance)
-    table.add_row(f'', f'[bold]R${balance:,.2f}')
-
-    if update:
-        border_style = 'green'
-    elif not obj.is_active:
-        border_style = 'red'
-    else:
-        border_style = 'none'
-
-    panel = Panel(
-        table,
-        title=f'[bold]💰 {obj.name.upper()}',
-        title_align='left',
-        border_style=border_style,
-    )
-
-    console.print(panel)
 
 
 @click.group(invoke_without_command=True)
@@ -51,13 +19,7 @@ def bank(ctx) -> None:
         service = client.financial_accounts.all
         total_balance: float = 0
         if response := _handle_response(service):
-            results = sorted(
-                 response.results,
-                 key=lambda result : result.balance,
-                 reverse=True,
-            )
-
-            for obj in results:
+            for obj in response.results:
                 total_balance += float(obj.balance)
                 _format_bank(obj)
 
