@@ -65,9 +65,9 @@ def create(
         )
         console.print((
             '🚨 Inform a type of transaction:'
-            '\n🏧 [bold][-t][/bold] or [bold][--transfer][/bold]'
-            '\n🏧 [bold][-c][/bold] or [bold][--credit][/bold]'
-            '\n🏧 [bold][-d][/bold] or [bold][--debit][/bold]'
+            '\n🏧 [bold][-t][/bold] [bold][--transfer][/bold]'
+            '\n🏧 [bold][-c][/bold] [bold][--credit][/bold]'
+            '\n🏧 [bold][-d][/bold] [bold][--debit][/bold]'
         ))
         sys.exit(0)
 

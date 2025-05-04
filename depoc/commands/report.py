@@ -1,5 +1,6 @@
 import depoc
 import click
+import sys
 
 from rich.console import Console
 from rich.panel import Panel
@@ -9,15 +10,30 @@ from .utils._response import _handle_response
 
 
 client = depoc.DepocClient()
+console = Console()
 
 
 @click.command
-@click.option('-d', '--date', default='week')
+@click.option('-d', '--date')
 @click.option('-s', '--start-date')
 @click.option('-e', '--end-date')
 @click.pass_context
 def report(ctx, date: str, start_date: str, end_date: str) -> None:
     ''' Financial report for a specific period. '''
+    if not any([date, start_date, end_date]):
+        params = {'date': 'week'}
+    elif date and not any([start_date, end_date]):
+        params = {'date': date}
+    elif start_date and end_date:
+        params = {'start_date': start_date, 'end_date': end_date}
+    else:
+        console.print(
+            '📅 [bold][-s] [--start-date] \n[/bold]'
+            '📅 [bold][-e] [--end-date] \n[/bold]'
+            '🚨 Must be specified as a pair'
+        )
+        sys.exit()
+
     caption = date
     if start_date and end_date:
         caption = f'{start_date} → {end_date}'
@@ -40,18 +56,14 @@ def report(ctx, date: str, start_date: str, end_date: str) -> None:
 
     if receivables_response := _handle_response(
         receivables,
-        date=date,
-        start_date=start_date,
-        end_date=end_date,
+        **params,
     ):  
         for obj in receivables_response.results:
             total_receivable += float(obj.outstanding_balance)
 
     if payables_response := _handle_response(
         payables,
-        date=date,
-        start_date=start_date,
-        end_date=end_date,
+        **params
     ):
         for obj in payables_response.results:
             total_payable += float(obj.outstanding_balance)
@@ -84,5 +96,4 @@ def report(ctx, date: str, start_date: str, end_date: str) -> None:
             border_style=border_style,
         )
 
-        console = Console()
         console.print(profile)
