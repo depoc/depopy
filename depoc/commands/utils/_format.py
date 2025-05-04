@@ -59,6 +59,38 @@ emojis = {
 }
 
 
+def _format_bank(obj, update: bool = False):
+    table = Table(
+        show_header=False,
+        show_footer=True,
+        box=None,
+        expand=True,
+        caption=f'{obj.id}',
+        caption_justify='left'
+        )
+    
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='right', no_wrap=True)
+    balance = float(obj.balance)
+    table.add_row(f'', f'[bold]R${balance:,.2f}')
+
+    if update:
+        border_style = 'green'
+    elif not obj.is_active:
+        border_style = 'red'
+    else:
+        border_style = 'none'
+
+    panel = Panel(
+        table,
+        title=f'[bold]💰 {obj.name.upper()}',
+        title_align='left',
+        border_style=border_style,
+    )
+
+    console.print(panel)
+
+
 def _format_category(obj, highlight: bool = False):
     table = Table(
         show_header=True,
