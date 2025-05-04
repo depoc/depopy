@@ -1,5 +1,7 @@
 import click
 
+from ._version import VERSION
+
 from .commands import account
 from .commands import login
 from .commands import logout
@@ -15,6 +17,7 @@ from .commands import owner
 from .commands import balance
 
 @click.group()
+@click.version_option(message=f'Depoc {VERSION}')
 def main() -> None:
    pass
  
