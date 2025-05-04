@@ -1,16 +1,28 @@
-from setuptools import setup, find_packages # type: ignore
+import os
+from setuptools import setup, find_packages
 
-LONG_DESCRIPTION: str = (
-    'The depoc-api Python library makes HTTP requests to Depoc '
-    'in order to retrieve, create, update, or delete resources '
-    '(e.g. Order, Product, Contacts).'
-)
+here = os.path.abspath(os.path.dirname(__file__))
+
+os.chdir(here)
+
+with open(
+    os.path.join(here, 'README.md'), encoding='utf-8'
+) as readme_file:
+    readme = readme_file.read()
+
+version_contents = {}
+with open(
+    os.path.join(here, 'depoc', '_version.py'),
+    encoding='utf-8'
+) as f:
+    exec(f.read(), version_contents)
 
 setup(
     name='depoc',
-    version='0.1.5', 
+    version=version_contents['VERSION'], 
     description='Python bindings for the Depoc API',
-    long_description=LONG_DESCRIPTION,
+    long_description=readme,
+    long_description_content_type='text/markdown',
     author='Hugo Belém',
     url='https://github.com/hugobelem/depoc-api',
     license='MIT',
