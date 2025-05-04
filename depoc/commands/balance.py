@@ -1,5 +1,6 @@
 import depoc
 import click
+import sys
 
 from rich.console import Console
 from rich.panel import Panel
@@ -12,12 +13,27 @@ client = depoc.DepocClient()
 
 
 @click.command
-@click.option('-d', '--date', default='week')
+@click.option('-d', '--date')
 @click.option('-s', '--start-date')
 @click.option('-e', '--end-date')
 @click.pass_context
 def balance(ctx, date: str, start_date: str, end_date: str) -> None:
     ''' Balance for a specific period. '''
+    if not any([date, start_date, end_date]):
+        date = 'week'
+        params = {'date': date}
+    elif date and not any([start_date, end_date]):
+        params = {'date': date}
+    elif start_date and end_date:
+        params = {'start_date': start_date, 'end_date': end_date}
+    else:
+        console.print(
+            '📅 [bold][-s] [--start-date] \n[/bold]'
+            '📅 [bold][-e] [--end-date] \n[/bold]'
+            '🚨 Must be specified as a pair'
+        )
+        sys.exit()
+    
     caption = date
     if start_date and end_date:
         caption = f'{start_date} → {end_date}'
@@ -34,9 +50,7 @@ def balance(ctx, date: str, start_date: str, end_date: str) -> None:
 
     if response := _handle_response(
         service,
-        date=date,
-        start_date=start_date,
-        end_date=end_date,
+        **params,
         ):
         for obj in response.results:
             if obj.type == 'credit':

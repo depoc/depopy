@@ -21,7 +21,8 @@ console = Console()
 def report(ctx, date: str, start_date: str, end_date: str) -> None:
     ''' Financial report for a specific period. '''
     if not any([date, start_date, end_date]):
-        params = {'date': 'week'}
+        date = 'week'
+        params = {'date': date}
     elif date and not any([start_date, end_date]):
         params = {'date': date}
     elif start_date and end_date:
