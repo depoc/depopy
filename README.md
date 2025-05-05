@@ -1,6 +1,6 @@
 # Depoc API Python Library
  
-I built this library to simplify interaction with the Depoc API, which I'm currently developing. It enables convenient HTTP requests - retrieving, creating, updating, and deleting resources - and allows me to uae the API daily in a real business environment.
+I built this library to simplify interaction with the Depoc API, which I'm currently developing. It enables convenient HTTP requests - retrieving, creating, updating, and deleting resources - and allows me to use the API daily in a real business environment.
 
 This library also includes a CLI tool, accessible via the `depoc` command, which will be described in detail later.
 
@@ -19,7 +19,7 @@ $ Pip install depoc
 
 The library requires your account's access token for authentication.
 
-Currently, the only supported method is to instantiate the Connection class with your username and password.
+Currently, the only supported method to get your token is to instantiate the Connection class with your username and password.
 
 ```python
 from depoc import Connection
@@ -32,7 +32,7 @@ user.token
 
 ## Usage
 
-You're now ready to configure and start using the library.
+You're now ready to start using the library. Instatiate the DepocClient class with the access token you just got.
 
 ```python
 from depoc import DepocClient
@@ -71,6 +71,8 @@ $ depoc login
 Username: foo
 Password: bar
 ```
+
+## CLI Usage
 
 ```sh
 depoc [command]
