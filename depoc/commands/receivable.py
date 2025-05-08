@@ -163,7 +163,6 @@ def update(
     notes: str,
     ) -> None:
     ''' Update an specific payable. '''
-    # Bug to fix: unable to update a field to an empty value
     data: dict[str, Any] = {}
     data.update({'contact': contact}) if contact else None
     data.update({'category': category}) if category else None

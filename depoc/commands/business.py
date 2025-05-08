@@ -96,18 +96,18 @@ def update(
         sys.exit()
 
     data: dict[str, Any] = {}
-    data.update({'legal_name': legal_name}) if legal_name else ''
-    data.update({'trade_name': trade_name}) if trade_name else ''
-    data.update({'cnpj': cnpj}) if cnpj else ''
-    data.update({'ie': ie}) if ie else ''
-    data.update({'im': im}) if im else ''
-    data.update({'phone': phone}) if phone else ''
-    data.update({'email': email}) if email else ''
-    data.update({'postcode': postcode}) if postcode else ''
-    data.update({'city': city}) if city else ''
-    data.update({'state': state}) if state else ''
-    data.update({'address': address}) if address else ''
-    data.update({'is_active': True}) if activate else ''
+    data.update({'legal_name': legal_name}) if legal_name else None
+    data.update({'trade_name': trade_name}) if trade_name else None
+    data.update({'cnpj': cnpj}) if cnpj else None
+    data.update({'ie': ie}) if ie else None
+    data.update({'im': im}) if im else None
+    data.update({'phone': phone}) if phone else None
+    data.update({'email': email}) if email else None
+    data.update({'postcode': postcode}) if postcode else None
+    data.update({'city': city}) if city else None
+    data.update({'state': state}) if state else None
+    data.update({'address': address}) if address else None
+    data.update({'is_active': True}) if activate else None
 
     service = client.business.update
 

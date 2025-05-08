@@ -115,23 +115,21 @@ def update(
     activate: bool,
     ) -> None:
     ''' Update an specific customer. '''
-
-    # unable to update a field to an empty value
     data: dict[str, Any] = {}
-    data.update({'code': code}) if code else ''
-    data.update({'legal_name': legal_name}) if legal_name else ''
-    data.update({'trade_name': trade_name}) if trade_name else ''
-    data.update({'cnpj': cnpj}) if cnpj else ''
-    data.update({'ie': ie}) if ie else ''
-    data.update({'im': im}) if im else ''
-    data.update({'notes': notes}) if notes else ''
-    data.update({'phone': phone}) if phone else ''
-    data.update({'email': email}) if email else ''
-    data.update({'postcode': postcode}) if postcode else ''
-    data.update({'city': city}) if city else ''
-    data.update({'state': state}) if state else ''
-    data.update({'address': address}) if address else ''
-    data.update({'is_active': True}) if activate else ''
+    data.update({'code': code}) if code else None
+    data.update({'legal_name': legal_name}) if legal_name else None
+    data.update({'trade_name': trade_name}) if trade_name else None
+    data.update({'cnpj': cnpj}) if cnpj else None
+    data.update({'ie': ie}) if ie else None
+    data.update({'im': im}) if im else None
+    data.update({'notes': notes}) if notes else None
+    data.update({'phone': phone}) if phone else None
+    data.update({'email': email}) if email else None
+    data.update({'postcode': postcode}) if postcode else None
+    data.update({'city': city}) if city else None
+    data.update({'state': state}) if state else None
+    data.update({'address': address}) if address else None
+    data.update({'is_active': True}) if activate else None
 
     service = client.suppliers.update
 
