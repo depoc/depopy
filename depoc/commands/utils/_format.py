@@ -26,6 +26,7 @@ emojis = {
     'Username': '👤',
     'Active': '🟢',
     'Staff': '💼',
+    'Role': '💼',
     'Last Login': '🕒',
     'Date Joined': '📅',
     'Code':'🆔',
@@ -46,19 +47,87 @@ emojis = {
     'Issued At': '📅',
     'Due At': '📅',
     'Paid At': '📅',
+    'Hire Date': '📅',
     'Updated At': '🕒',
     'Total Amount': '💰',
     'Amount Paid': '💸',
     'Outstanding Balance': '💵',
+    'Salary': '💵',
     'Payment Type': '🏧',
     'Payment Method': '💳',
     'Status': '🟢',
+    'Has Access': '🟢',
+    'Credential': '🔑',
     'Recurrence': '⏳',
     'Installment Count': '⏰',
     'Due Weekday': '📆',
     'Due Day Of Month': '📆',
+    'Birthday': '📆',
     'Reference': '📎',
 }
+
+
+def _format_member(
+        obj: DepocObject,
+        title: str,
+        update: bool = False,
+    ):
+
+    if obj.credential:
+        title = f'@{obj.credential.username}'
+    else:
+        title = ''
+
+    table = Table(
+        show_header=True,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=title,
+        title_justify='right',
+    )
+
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='left', no_wrap=True)
+
+    data = obj.to_dict()
+    data.pop('id')
+
+    for k, v in data.items():
+        k = k.replace('_', ' ').title()
+        k = k.replace('Is ', '')
+        k = k.upper() if k in ('Cpf', 'Cnpj', 'Ie', 'Im') else k
+        k = 'Birthday' if k == 'Date Of Birth' else k
+
+        if isinstance(v, DepocObject):
+            v = f'@{v.username}'
+        
+        if v and obj.is_active:
+            table.add_row(f'{emojis[k]} {k}: ', f'{v}')
+
+    if update:
+        style = 'green'
+        panel_title = f'[bold][green]{obj.name}'
+        subtitle = f'[green]{obj.id}'
+    elif not obj.is_active:
+        style = 'grey50'
+        panel_title = f'[bold][grey0]{obj.name}'
+        subtitle = f'[grey0]Deactivated • {obj.id}'
+    else:
+        style = 'none'
+        panel_title = f'[bold]{obj.name}'
+        subtitle = f'[blue]{obj.id}'
+
+    profile = Panel(
+        table,
+        title=panel_title,
+        title_align='left', 
+        subtitle=subtitle,
+        subtitle_align='left',
+        style=style
+    )
+
+    console.print(profile)
 
 
 def _format_business(
@@ -97,9 +166,9 @@ def _format_business(
         panel_title = f'[bold][green]{title}'
         subtitle = f'[green]{response.id}'
     elif not response.is_active:
-        style = 'bright_red'
-        panel_title = f'[bold][bright_red]{title}'
-        subtitle = f'[bright_red]{response.id}'
+        style = 'grey50'
+        panel_title = f'[bold][grey0]{title}'
+        subtitle = f'[grey0]Deactivated • {response.id}'
     else:
         style = 'none'
         panel_title = f'[bold]{title}'

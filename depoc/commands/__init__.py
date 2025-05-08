@@ -11,3 +11,4 @@ from .report import report
 from .supplier import supplier
 from .balance import balance
 from .business import business
+from .member import member

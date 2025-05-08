@@ -54,6 +54,8 @@ def report(ctx, date: str, start_date: str, end_date: str) -> None:
     if banks_response := _handle_response(banks):
         for obj in banks_response.results:
             current_balance += float(obj.balance)
+    else:
+        sys.exit()
 
     if receivables_response := _handle_response(
         receivables,

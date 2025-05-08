@@ -19,7 +19,7 @@ console = Console()
 @click.group(invoke_without_command=True)
 @click.pass_context
 def business(ctx) -> None:
-    ''' Maange Business '''
+    ''' Maange Business. '''
     if ctx.invoked_subcommand is None:
         service = client.business.get
         if response := _handle_response(service):
@@ -87,7 +87,7 @@ def update(
     address: str,
     activate: bool,
     ) -> None:
-    ''' Update an specific customer. '''
+    ''' Update the business. '''
     if not any([
         legal_name, trade_name, cnpj, ie, im, phone,
         email, postcode, city, state, address, activate
@@ -116,7 +116,7 @@ def update(
 
 @business.command
 def delete() -> None:
-    ''' Delete an specific supplier. '''
+    ''' Delete the business. '''
     service = client.business.delete
 
     while True:

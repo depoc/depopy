@@ -111,7 +111,6 @@ def update(
     activate: bool,
     ) -> None:
     ''' Update an specific customer. '''
-    # unable to update a field to an empty value
     data: dict[str, Any] = {}
     data.update({'code': code}) if code else None
     data.update({'name': name}) if name else None
