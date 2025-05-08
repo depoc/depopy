@@ -48,15 +48,16 @@ def get(id: str) -> None:
 
 @bank.command
 @click.argument('id')
-@click.argument('name')
+@click.argument('name', required=False)
 @click.option('-A', '--activate', is_flag=True)
 def update(id: str, name: str, activate: bool = False) -> None:
     ''' Update a bank account. '''
-    data = {'name': name}
-
-    # I want to reactivate a bank without having to provide a name
-    if activate:
-        data.update({'is_active': True})
+    if name:
+        data = {'name': name}
+    elif activate:
+        data = {'is_active': True}
+    elif name and activate:
+        data = data = {'name': name, 'is_active': True}
 
     service = client.financial_accounts.update
 
