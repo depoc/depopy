@@ -1,16 +1,15 @@
 import depoc
 import click
-import time
 import sys
 
 from typing import Any
 
-from .utils._response import _handle_response
-from .utils._format import spinner, page_summary, _format_contact
-
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
+
+from .utils._response import _handle_response
+from .utils._format import _format_business
 
 
 client = depoc.DepocClient()
@@ -19,29 +18,20 @@ console = Console()
 
 @click.group(invoke_without_command=True)
 @click.pass_context
-@click.option('-l', '--limit', default=50)
-@click.option('-p', '--page', default=0)
-def supplier(cxt, limit: int, page: int) -> None:
-    ''' Manage suppliers. '''
-    if cxt.invoked_subcommand is None:
-        service = client.suppliers.all
-        
-        if response := _handle_response(service, limit=limit, page=page):
-            page_summary(response)
+def business(ctx) -> None:
+    ''' Maange Business '''
+    if ctx.invoked_subcommand is None:
+        service = client.business.get
+        if response := _handle_response(service):
+            _format_business(response, response.legal_name)
 
-            for obj in response.results:
-                _format_contact(obj, f'{obj.legal_name}')
-
-
-@supplier.command
+@business.command
 def create() -> None:
-    ''' Create supplier. '''
-    panel = Panel('[bold]+ ADD NEW SUPPLIER')
+    ''' Create business. '''
+    panel = Panel('[bold]+ CREATE BUSINESS')
     console.print(panel)
 
     data: dict[str, Any] = {}
-    data.update({'code': Prompt.ask('🆔 Code', default=None)})
-    console.rule('',style=None, align='left')
     data.update({'legal_name': Prompt.ask('✏️  Legal Name', default=None)})
     console.rule('',style=None, align='left')
     data.update({'trade_name': Prompt.ask('™️  Trade Name', default=None)})
@@ -64,48 +54,31 @@ def create() -> None:
     console.rule('',style=None, align='left')
     data.update({'address': Prompt.ask('📍 Address', default=None)})
     console.rule('',style=None, align='left')
-    data.update({'notes': Prompt.ask('🗒️  Notes', default=None)})
-    console.rule('',style=None, align='left')
 
-    service = client.suppliers.create
+    service = client.business.create
 
-    if obj := _handle_response(service, data):
-        _format_contact(obj, obj.legal_name)
+    if response := _handle_response(service, data):
+        _format_business(response, response.legal_name)
 
-@supplier.command
-@click.argument('id')
-def get(id: str) -> None:
-    ''' Retrieve an specific supplier. '''
-    service = client.suppliers.get
-
-    if obj := _handle_response(service, resource_id=id):
-        _format_contact(obj, obj.legal_name)
-
-@supplier.command
-@click.argument('id')
-@click.option('-c', '--code')
+@business.command
 @click.option('-l', '--legal_name')
 @click.option('-t', '--trade_name')
 @click.option('-p', '--phone')
 @click.option('-e', '--email')
-@click.option('-s', '--state')
 @click.option('--cnpj')
 @click.option('--ie')
 @click.option('--im')
-@click.option('--notes')
 @click.option('--city')
 @click.option('--address')
 @click.option('--postcode')
+@click.option('--state')
 @click.option('-A', '--activate', is_flag=True)
 def update(
-    id: str,
-    code: str,
     legal_name: str,
     trade_name: str,
     cnpj: str,
     ie: str,
     im: str,
-    notes: str,
     phone: str,
     email: str,
     postcode: str,
@@ -115,16 +88,19 @@ def update(
     activate: bool,
     ) -> None:
     ''' Update an specific customer. '''
+    if not any([
+        legal_name, trade_name, cnpj, ie, im, phone,
+        email, postcode, city, state, address, activate
+    ]):
+        console.print('🚨 Specify a field to update')
+        sys.exit()
 
-    # unable to update a field to an empty value
     data: dict[str, Any] = {}
-    data.update({'code': code}) if code else ''
     data.update({'legal_name': legal_name}) if legal_name else ''
     data.update({'trade_name': trade_name}) if trade_name else ''
     data.update({'cnpj': cnpj}) if cnpj else ''
     data.update({'ie': ie}) if ie else ''
     data.update({'im': im}) if im else ''
-    data.update({'notes': notes}) if notes else ''
     data.update({'phone': phone}) if phone else ''
     data.update({'email': email}) if email else ''
     data.update({'postcode': postcode}) if postcode else ''
@@ -133,16 +109,15 @@ def update(
     data.update({'address': address}) if address else ''
     data.update({'is_active': True}) if activate else ''
 
-    service = client.suppliers.update
+    service = client.business.update
 
-    if obj := _handle_response(service, data, resource_id=id):
-        _format_contact(obj, 'UPDATED', update=True)
+    if response := _handle_response(service, data):
+        _format_business(response, 'UPDATED', update=True)
 
-@supplier.command
-@click.argument('ids', nargs=-1)
-def delete(ids: str) -> None:
+@business.command
+def delete() -> None:
     ''' Delete an specific supplier. '''
-    service = client.suppliers.delete
+    service = client.business.delete
 
     while True:
         prompt = click.style('Proceed to deletion? [y/n] ', fg='red')
@@ -152,10 +127,5 @@ def delete(ids: str) -> None:
         elif confirmation == 'y':
             break
 
-    if len(ids) > 1:
-        spinner()
-
-    for id in ids:
-        time.sleep(0.5)
-        if _handle_response(service, resource_id=id):
-            console.print('✅ Supplier inactivated')
+    if _handle_response(service):
+        console.print('✅ Business inactivated')

@@ -15,6 +15,7 @@ from .commands import customer
 from .commands import supplier
 from .commands import owner
 from .commands import balance
+from .commands import business
 
 @click.group()
 @click.version_option(message=f'Depoc {VERSION}')
@@ -36,3 +37,4 @@ main.add_command(customer)
 main.add_command(supplier)
 main.add_command(owner)
 main.add_command(balance)
+main.add_command(business)

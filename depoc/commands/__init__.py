@@ -10,3 +10,4 @@ from .receivable import receivable
 from .report import report
 from .supplier import supplier
 from .balance import balance
+from .business import business

@@ -19,6 +19,8 @@ console = Console()
 emojis = {
     'ID': ':white_medium_star:',
     'Name': '✏️ ',
+    'Legal Name': '✏️ ',
+    'Trade Name': '™️ ',
     'Email': '✉️ ',
     'Phone': '📱',
     'Username': '👤',
@@ -57,6 +59,62 @@ emojis = {
     'Due Day Of Month': '📆',
     'Reference': '📎',
 }
+
+
+def _format_business(
+        response: DepocObject,
+        title: str,
+        update: bool = False,
+    ):
+
+    table = Table(
+        show_header=True,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=response.cnpj,
+        title_justify='right',
+        caption=response.trade_name,
+        caption_justify='right'
+    )
+
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='left', no_wrap=True)
+
+    data = response.to_dict()
+    data.pop('id')
+
+    for k, v in data.items():
+        k = k.replace('_', ' ').title()
+        k = k.replace('Is ', '')
+        k = k.upper() if k in ('Cpf', 'Cnpj', 'Ie', 'Im') else k
+        
+        if v and response.is_active:
+            table.add_row(f'{emojis[k]} {k}: ', f'{v}')
+
+    if update:
+        style = 'green'
+        panel_title = f'[bold][green]{title}'
+        subtitle = f'[green]{response.id}'
+    elif not response.is_active:
+        style = 'bright_red'
+        panel_title = f'[bold][bright_red]{title}'
+        subtitle = f'[bright_red]{response.id}'
+    else:
+        style = 'none'
+        panel_title = f'[bold]{title}'
+        subtitle = f'[blue]{response.id}'
+
+    profile = Panel(
+        table,
+        title=panel_title,
+        title_align='left', 
+        subtitle=subtitle,
+        subtitle_align='left',
+        style=style
+    )
+
+    console.print(profile)
 
 
 def _format_bank(obj, update: bool = False):
@@ -206,7 +264,6 @@ def _format_transactions(
     )
 
     console.print(profile)
-
 
 
 def _format_payments(
