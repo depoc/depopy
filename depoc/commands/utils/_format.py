@@ -5,66 +5,77 @@ import time
 import math
 
 from datetime import datetime
+from urllib.parse import urlparse, parse_qs
 
 from rich.console import Console, Group
 from rich.panel import Panel
 from rich.table import Table
 
-from typing import Literal
-
 from depoc.objects.base import DepocObject
 
 console = Console()
 
-emojis = {
-    'ID': ':white_medium_star:',
-    'Name': '✏️ ',
-    'Legal Name': '✏️ ',
-    'Trade Name': '™️ ',
-    'Email': '✉️ ',
-    'Phone': '📱',
-    'Username': '👤',
-    'Active': '🟢',
-    'Staff': '💼',
-    'Role': '💼',
-    'Last Login': '🕒',
-    'Date Joined': '📅',
-    'Code':'🆔',
-    'Gender': '⚧️ ',
-    'CPF': '📋',
-    'CNPJ': '📋',
-    'IE': '📋',
-    'IM': '📋',
-    'Postcode': '📮',
-    'City': '🏙️ ',
-    'State': '🗺️ ',
-    'Address': '📍',
-    'Amount Spent': '💸',
-    'Number Of Orders': '🛒',
-    'Created At': '📅',
-    'Updated At': '🕒',
-    'Category': '📂',
-    'Issued At': '📅',
-    'Due At': '📅',
-    'Paid At': '📅',
-    'Hire Date': '📅',
-    'Updated At': '🕒',
-    'Total Amount': '💰',
-    'Amount Paid': '💸',
-    'Outstanding Balance': '💵',
-    'Salary': '💵',
-    'Payment Type': '🏧',
-    'Payment Method': '💳',
-    'Status': '🟢',
-    'Has Access': '🟢',
-    'Credential': '🔑',
-    'Recurrence': '⏳',
-    'Installment Count': '⏰',
-    'Due Weekday': '📆',
-    'Due Day Of Month': '📆',
-    'Birthday': '📆',
-    'Reference': '📎',
-}
+
+def _format_product(
+        obj: DepocObject,
+        update: bool = False,
+    ):
+
+    table = Table(
+        show_header=True,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=obj.retail_price,
+        title_justify='right',
+        caption=obj.unit.title(),
+        caption_justify='right'
+    )
+
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='left', no_wrap=True)
+
+    data = obj.to_dict()
+    data.pop('id')
+    data.pop('name')
+    data.pop('is_active')
+    data.pop('unit')
+
+    for k, v in data.items():
+        k = k.replace('_', ' ').title()
+        k = k.replace('Is ', '')
+
+        if isinstance(v, DepocObject):
+            v = f'@{v.username}'
+        
+        if v and obj.is_active:
+            table.add_row(f'{k}: ', f'{v}')
+
+    name = obj.name.upper()
+
+    if update:
+        style = 'green'
+        panel_title = f'[bold][green]{name}'
+        subtitle = f'[green]{obj.id}'
+    elif not obj.is_active:
+        style = 'grey50'
+        panel_title = f'[bold][grey0]{name}'
+        subtitle = f'[grey0]Deactivated • {obj.id}'
+    else:
+        style = 'none'
+        panel_title = f'[bold]{name}'
+        subtitle = f'[blue]{obj.id}'
+
+    profile = Panel(
+        table,
+        title=panel_title,
+        title_align='left', 
+        subtitle=subtitle,
+        subtitle_align='left',
+        style=style
+    )
+
+    console.print(profile)
 
 
 def _format_member(
@@ -103,7 +114,7 @@ def _format_member(
             v = f'@{v.username}'
         
         if v and obj.is_active:
-            table.add_row(f'{emojis[k]} {k}: ', f'{v}')
+            table.add_row(f'{k}: ', f'{v}')
 
     if update:
         style = 'green'
@@ -159,7 +170,7 @@ def _format_business(
         k = k.upper() if k in ('Cpf', 'Cnpj', 'Ie', 'Im') else k
         
         if v and response.is_active:
-            table.add_row(f'{emojis[k]} {k}: ', f'{v}')
+            table.add_row(f'{k}: ', f'{v}')
 
     if update:
         style = 'green'
@@ -210,7 +221,7 @@ def _format_bank(obj, update: bool = False):
 
     panel = Panel(
         table,
-        title=f'[bold]💰 {obj.name.upper()}',
+        title=f'[bold]{obj.name.upper()}',
         title_align='left',
         border_style=border_style,
     )
@@ -381,7 +392,7 @@ def _format_payments(
         k = k.upper() if k in ('Cpf', 'Cnpj', 'Ie', 'Im') else k
         
         if v:
-            table.add_row(f'{emojis[k]} {k}: ', f'{v}')
+            table.add_row(f'{k}: ', f'{v}')
     
     notes = Table(
         show_header=False,
@@ -397,7 +408,7 @@ def _format_payments(
 
     style = 'none'
     panel_title = f'[bold]{title}'
-    subtitle = f'[bold]{obj.id}'
+    subtitle = f'[bold][blue]{obj.id}'
     border_style = 'none'
 
     if update:
@@ -473,7 +484,7 @@ def _format_contact(
         k = k.upper() if k in ('Cpf', 'Cnpj', 'Ie', 'Im') else k
         
         if v and obj.is_active:
-            table.add_row(f'{emojis[k]} {k}: ', f'{v}')
+            table.add_row(f'{k}: ', f'{v}')
     
     group = Group(table)
 
@@ -536,7 +547,7 @@ def _format_profile(
         k = k.replace('Is ', '')
         k = k.upper() if k == 'Id' else k
         
-        table.add_row(f'{emojis[k]} {k}: ', f'{v}')
+        table.add_row(f'{k}: ', f'{v}')
 
     if update:
         style = 'green'
@@ -551,62 +562,6 @@ def _format_profile(
     console.print(profile)
 
 
-def _format_response(
-        obj: DepocObject,
-        title: str,
-        header: str,
-        highlight: str | None = None,
-        color: Literal[
-            'red',
-            'green',
-            'yellow',
-            'blue',
-            'magenta',
-            'cyan',
-        ] = 'yellow',
-        remove: list[str] | None = None,
-    ):
-    
-    try:
-        if obj.is_active == False:
-            color = 'red'
-    except AttributeError:
-        pass
-
-    title = click.style(f'{title.upper():-<50}', fg=color, bold=True)
-    header = click.style(f'\n{header:>50}', bold=True)
-
-    if highlight:
-        if len(highlight) > 50:
-            highlight = highlight[:50] if len(highlight) > 50 else None
-        highlight = click.style(f'\n{highlight:>50}', bold=True)
-
-    data = obj.to_dict()
-    body: str = ''
-
-    if remove:
-        for item in remove:
-            data.pop(item)
-
-    for k, v in data.items():
-        k = k.replace('_', ' ').title()
-        k = k.upper() if k == 'Id' else k
-
-        if isinstance(v, DepocObject):
-            if hasattr(v, 'name'):
-                v = v.name
-
-        body += f'\n{k}: {v}'
-
-    response = (
-        f'{title}'
-        f'{header}'
-        f'{highlight if highlight else ''}'
-        f'{body}'
-    )
-    click.echo(response)
-
-
 def spinner() -> None:
     spinner_cycle = itertools.cycle(['-', '\\', '|', '/'])
     for _ in range(20):
@@ -619,16 +574,18 @@ def spinner() -> None:
 def page_summary(response: DepocObject):
     total_pages = math.ceil(response.count / 50)
     results_count = len(response.results)
-    current_page_number = 1
+    current_page = 0
 
     if response.next:
-        next_page_number = response.next[-1]
-        current_page_number = int(next_page_number) - 1
+        query = urlparse(response.next).query
+        params = parse_qs(query)
+        next_page = int(params.get('page', [1])[0])
+        current_page = next_page - 1
     elif response.previous and not response.next:
-        current_page_number = total_pages
+        current_page = total_pages
 
     message = (
-        f'\n[Page {current_page_number}/{total_pages}] '
+        f'\n[Page {current_page}/{total_pages}] '
         f'Showing {results_count} results (Total: {response.count})\n'
     )
 
