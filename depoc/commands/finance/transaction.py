@@ -45,9 +45,28 @@ def transaction(ctx, limit: int, page: int, bank: str) -> None:
             else:
                 page_summary(response)
 
-            for obj in results:
-                title = f'\n{obj.account.name} {obj.type}'.upper()
-                _format_transactions(obj, title)
+        income = 0
+        expenses = 0
+        for obj in results:
+            if obj.type == 'credit':
+                income += float(obj.amount)
+            elif obj.type == 'debit':
+                expenses += float(obj.amount)
+            title = f'\n{obj.account.name} {obj.type}'.upper()
+            _format_transactions(obj, title)
+
+        balance = income - abs(expenses)
+
+        format_income = f'[yellow]R${income:,.2f}[/yellow]'
+        format_expenses = f'[yellow]R${abs(expenses):,.2f}[/yellow]'
+        format_balance = f'[yellow]R${balance:,.2f}[/yellow]'
+
+        message = (
+            f'\n{'[bold]📈 Income: ' + format_income}\n'
+            f'\n{'[bold]📉 Expenses: ' + format_expenses}\n'
+            f'\n{'[bold]💵 Balance: ' + format_balance}\n'
+        )
+        console.print(message)
 
 @transaction.command
 @click.option('-c', '--credit', is_flag=True)
@@ -139,6 +158,7 @@ def delete(ids: str) -> None:
 @click.option('-e', '--end-date')
 @click.option('-b', '--bank')
 @click.option('-l', '--limit', default=50)
+@click.option('-p', '--page', default=0)
 @click.pass_context
 def search(
     ctx,
@@ -148,6 +168,7 @@ def search(
     end_date: str,
     bank: str,
     limit: int,
+    page: int,
     ) -> None:
     ''' Filter transactions. '''
     if not any([search, date, start_date, end_date]):
@@ -163,6 +184,7 @@ def search(
         start_date=start_date,
         end_date=end_date,
         limit=limit,
+        page=page,
     ):
         results = response.results
         if bank:
@@ -180,6 +202,25 @@ def search(
         else:
             page_summary(response)
 
+        income = 0
+        expenses = 0
         for obj in results:
+            if obj.type == 'credit':
+                income += float(obj.amount)
+            elif obj.type == 'debit':
+                expenses += float(obj.amount)
             title = f'\n{obj.account.name} {obj.type}'.upper()
             _format_transactions(obj, title)
+
+        balance = income - abs(expenses)
+
+        format_income = f'[yellow]R${income:,.2f}[/yellow]'
+        format_expenses = f'[yellow]R${abs(expenses):,.2f}[/yellow]'
+        format_balance = f'[yellow]R${balance:,.2f}[/yellow]'
+
+        message = (
+            f'\n{'[bold]📈 Income: ' + format_income}\n'
+            f'\n{'[bold]📉 Expenses: ' + format_expenses}\n'
+            f'\n{'[bold]💵 Balance: ' + format_balance}\n'
+        )
+        console.print(message)
