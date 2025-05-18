@@ -12,6 +12,7 @@ class Finder(APIResource[T]):
             start_date: str | None = None,
             end_date: str | None = None,
             limit: int | None = None,
+            page: int | None = None,
         ):
         endpoint = f'{cls.endpoint}/?'
 
@@ -23,6 +24,9 @@ class Finder(APIResource[T]):
 
         if start_date and end_date:
             endpoint += f'&start_date={start_date}&end_date={end_date}'
+
+        if page:
+            endpoint += f'&page={page}'
 
         response = cls.requestor.request('GET', endpoint)
         return cls._paginate(response, limit)
