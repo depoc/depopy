@@ -13,9 +13,9 @@ client = depoc.DepocClient()
 @click.argument('search', required=False)
 @click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
-def contact(cxt, limit: int, page: int, search: str) -> None:
+def contact(ctx, limit: int, page: int, search: str) -> None:
     ''' Contacts - retrieve all and filter. '''
-    if cxt.invoked_subcommand is None:
+    if ctx.invoked_subcommand is None:
         service = client.contacts.all
         response = _handle_response(service, limit=limit, page=page)
 
