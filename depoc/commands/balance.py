@@ -52,11 +52,26 @@ def balance(ctx, date: str, start_date: str, end_date: str) -> None:
         service,
         **params,
         ):
+
         for obj in response.results:
             if obj.type == 'credit':
                 income += float(obj.amount)
             elif obj.type == 'debit':
                 expenses += float(obj.amount)
+
+        has_next_page: bool = response.next is not None
+        next_page = 2
+        while has_next_page:
+            response_ = _handle_response(service, **params, page=next_page)
+
+            for obj in response_.results:
+                if obj.type == 'credit':
+                    income += float(obj.amount)
+                elif obj.type == 'debit':
+                    expenses += float(obj.amount)
+
+            next_page += 1
+            has_next_page = False if not response_.next else True
 
         balance = round(income + expenses, 2)
 
