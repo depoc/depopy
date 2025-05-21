@@ -16,8 +16,7 @@ client = depoc.DepocClient()
 @click.option('-d', '--date')
 @click.option('-s', '--start-date')
 @click.option('-e', '--end-date')
-@click.pass_context
-def balance(ctx, date: str, start_date: str, end_date: str) -> None:
+def balance(date: str, start_date: str, end_date: str) -> None:
     ''' Balance for a specific period. '''
     if not any([date, start_date, end_date]):
         date = 'week'
