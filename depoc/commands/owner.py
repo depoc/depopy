@@ -1,13 +1,17 @@
 import depoc
 import click
+import sys
 
 from typing import Any
+
+from rich.console import Console
 
 from .utils._response import _handle_response
 from .utils._format import _format_profile
 
 
 client = depoc.DepocClient()
+console = Console()
 
 
 @click.group(invoke_without_command=True)
@@ -26,6 +30,11 @@ def owner(ctx) -> None:
 @click.option('-p', '--phone')
 def update(name: str, email: str, phone: str) -> None:
     ''' Update owner. '''
+    if not any([
+       name, email, phone
+    ]):
+        console.print('🚨 Specify a field to update')
+        sys.exit()
     data: dict[str, Any] = {}
     data.update({'name': name}) if name else None
     data.update({'email': email}) if email else None

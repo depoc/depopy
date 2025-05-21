@@ -163,7 +163,12 @@ def update(
     notes: str,
     ) -> None:
     ''' Update an specific payable. '''
-    # Bug to fix: unable to update a field to an empty value
+    if not any([
+       contact, category, issued_at, due_at, total_amount,
+       payment_method, reference, notes,
+    ]):
+        console.print('🚨 Specify a field to update')
+        sys.exit()
     data: dict[str, Any] = {}
     data.update({'contact': contact}) if contact else None
     data.update({'category': category}) if category else None

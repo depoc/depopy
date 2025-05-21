@@ -2,11 +2,14 @@ import depoc
 import click
 import sys
 
+from rich.console import Console
+
 from .utils._response import _handle_response
 from .utils._format import _format_profile
 
 
 client = depoc.DepocClient()
+console = Console()
 
 
 @click.group
@@ -19,6 +22,11 @@ def account() -> None:
 @click.option('-e', '--email')
 @click.option('-u', '--username')
 def update(name: str, email: str, username: str) -> None:
+    if not any([
+       name, email, username
+    ]):
+        console.print('🚨 Specify a field to update')
+        sys.exit()
     data = {}
     data.update({'name': name}) if name else None
     data.update({'email': email}) if email else None

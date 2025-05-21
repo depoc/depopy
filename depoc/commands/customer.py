@@ -111,6 +111,13 @@ def update(
     activate: bool,
     ) -> None:
     ''' Update an specific customer. '''
+    if not any([
+       code, name, alias, gender, cpf, notes, phone, email,
+       postcode, city, state, address, activate
+    ]):
+        console.print('🚨 Specify a field to update')
+        sys.exit()
+
     data: dict[str, Any] = {}
     data.update({'code': code}) if code else None
     data.update({'name': name}) if name else None

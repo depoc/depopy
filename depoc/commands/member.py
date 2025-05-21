@@ -85,6 +85,12 @@ def update(
     activate: bool,
     ) -> None:
     ''' Update an specific member. '''
+    if not any([
+       cpf, role, name, phone, email, salary, has_access,
+       hire_date, date_of_birth, activate
+    ]):
+        console.print('🚨 Specify a field to update')
+        sys.exit()
     data: dict[str, Any] = {}
     data.update({'role': role}) if role else None
     data.update({'name': name}) if name else None
