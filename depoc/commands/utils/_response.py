@@ -24,11 +24,11 @@ def _handle_response(
     '''
     try:
         if data and resource_id:
-            response = service(data, resource_id)
+            response = service(data, resource_id, **params)
         elif data:
             response = service(data)
         elif resource_id:
-            response = service(resource_id)
+            response = service(resource_id, **params)
         else:
             response = service(**params)
 
