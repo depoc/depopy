@@ -28,7 +28,7 @@ def _format_product(
         expand=True,
         title=obj.retail_price,
         title_justify='right',
-        caption=obj.unit.title(),
+        caption=f'{str(obj.stock)}',
         caption_justify='right'
     )
 
@@ -39,7 +39,6 @@ def _format_product(
     data.pop('id')
     data.pop('name')
     data.pop('is_active')
-    data.pop('unit')
 
     for k, v in data.items():
         k = k.replace('_', ' ').title()
@@ -562,10 +561,10 @@ def _format_profile(
     console.print(profile)
 
 
-def spinner() -> None:
+def spinner(text: str = 'Deleting') -> None:
     spinner_cycle = itertools.cycle(['-', '\\', '|', '/'])
     for _ in range(20):
-        sys.stdout.write(f'\rDeleting {next(spinner_cycle)} ')
+        sys.stdout.write(f'\r{text} {next(spinner_cycle)} ')
         sys.stdout.flush()
         time.sleep(0.1)
     click.echo('')
@@ -576,13 +575,17 @@ def page_summary(response: DepocObject):
     results_count = len(response.results)
     current_page = 0
 
+    last_page = response.previous and not response.next
+
     if response.next:
         query = urlparse(response.next).query
         params = parse_qs(query)
         next_page = int(params.get('page', [1])[0])
         current_page = next_page - 1
-    elif response.previous and not response.next:
+    elif last_page:
         current_page = total_pages
+    elif total_pages != 0 and total_pages <= 50:
+        current_page = 1
 
     message = (
         f'\n[Page {current_page}/{total_pages}] '
