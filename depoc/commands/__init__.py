@@ -12,3 +12,5 @@ from .supplier import supplier
 from .balance import balance
 from .business import business
 from .member import member
+from .product import product
+from .bank import bank
