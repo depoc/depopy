@@ -10,7 +10,7 @@ class Inventory(Retrieve[InventoryObject]):
 
 class ProductInventory(Retrieve[InventoryObject], Update[InventoryObject]):
     obj = InventoryObject
-    endpoint = 'products/<id>/inventory'
+    endpoint = 'products/inventory'
     label = 'inventory'
 
 
@@ -21,5 +21,16 @@ class InventoryTransaction(
     Delete[InventoryTransctionObject],
 ):
     obj = InventoryTransctionObject
-    endpoint = 'products/<id>/inventory/transactions'
+    endpoint = 'products/inventory/<id>/transactions'
+    label = 'transaction'
+
+
+class InventoryTransactionID(
+    Create[InventoryTransctionObject],
+    Retrieve[InventoryTransctionObject],
+    Update[InventoryTransctionObject],
+    Delete[InventoryTransctionObject],
+):
+    obj = InventoryTransctionObject
+    endpoint = 'products/inventory/transactions'
     label = 'transaction'
