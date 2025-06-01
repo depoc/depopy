@@ -16,6 +16,128 @@ from depoc.objects.base import DepocObject
 console = Console()
 
 
+def _format_transaction_inventory(
+        obj: DepocObject,
+        update: bool = False,
+    ):
+
+    date = datetime.fromisoformat(obj.date)
+    obj.date = date.strftime('%Y-%m-%d %H:%M:%S')
+
+    table = Table(
+        show_header=True,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=f'{obj.inventory.product}',
+        caption=f'{obj.date}',
+        title_justify='right',
+        caption_justify='center',
+    )
+
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='left', no_wrap=True)
+
+    data = obj.to_dict()
+    data.pop('id')
+    data.pop('type')
+    data.pop('description')
+    data.pop('date')
+
+    for k, v in data.items():
+        k = k.replace('_', ' ').title()
+        
+        if isinstance(v, DepocObject):
+            v = v.id
+
+        table.add_row(f'{k}: ', f'{v}')
+
+    panel_title = f'[{obj.quantity}] {obj.type.upper()}'
+
+    if update:
+        style = 'green'
+        panel_title = f'[bold][green]{panel_title}'
+        subtitle = f'[green]{obj.id}'
+    else:
+        style = 'none'
+        panel_title = f'[bold]{panel_title}'
+        subtitle = f'[blue]{obj.id}'
+
+    description = Table(
+        show_header=False,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=obj.description,
+        title_justify='center',
+    )
+    description.add_column('', justify='left', no_wrap=True)
+    
+    group = Group(table, description)
+
+    profile = Panel(
+        group,
+        title=panel_title,
+        title_align='left', 
+        subtitle=subtitle,
+        subtitle_align='left',
+        style=style
+    )
+
+    console.print(profile)
+
+
+def _format_inventory(
+        obj: DepocObject,
+        update: bool = False,
+    ):
+
+    table = Table(
+        show_header=True,
+        show_footer=True,
+        box=None,
+        expand=True,
+        title=f'Inventory',
+        title_justify='right',
+    )
+
+    table.add_column('', justify='left', no_wrap=True)
+    table.add_column('', justify='left', no_wrap=True)
+
+    data = obj.to_dict()
+    data.pop('id')
+
+    for k, v in data.items():
+        k = k.title()
+        
+        if isinstance(v, DepocObject):
+            v = v.id
+
+        table.add_row(f'{k}: ', f'{v}')
+
+    name = f'[{obj.quantity}] {obj.product.name.upper()}'
+
+    if update:
+        style = 'green'
+        panel_title = f'[bold][green]{name}'
+        subtitle = f'[green]{obj.id}'
+    else:
+        style = 'none'
+        panel_title = f'[bold]{name}'
+        subtitle = f'[blue]{obj.id}'
+
+    profile = Panel(
+        table,
+        title=panel_title,
+        title_align='left', 
+        subtitle=subtitle,
+        subtitle_align='left',
+        style=style
+    )
+
+    console.print(profile)
+
+
 def _format_product(
         obj: DepocObject,
         update: bool = False,
