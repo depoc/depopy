@@ -18,7 +18,7 @@ from .commands import owner
 from .commands import balance
 from .commands import business
 from .commands import member
-from .commands import product
+from .commands import p as product
 from .commands import inventory
 
 @click.group()
@@ -31,7 +31,7 @@ main.add_command(login)
 main.add_command(logout)
 main.add_command(me)
 main.add_command(bank)
-main.add_command(finance.financial)
+main.add_command(finance.f)
 main.add_command(contact)
 main.add_command(receivable)
 main.add_command(payable)

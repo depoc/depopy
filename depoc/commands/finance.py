@@ -30,10 +30,10 @@ def get_tables(tables: list):
         yield table
 
 @click.group
-def financial() -> None:
+def f() -> None:
     ''' Manage financial categories and transactions'''
 
-@financial.group(invoke_without_command=True)
+@f.group(invoke_without_command=True)
 @click.pass_context
 @click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
@@ -176,7 +176,7 @@ def delete(ids: str) -> None:
             console.print('✅ Category inactivated')
 
 
-@financial.group(invoke_without_command=True)
+@f.group(invoke_without_command=True)
 @click.pass_context
 @click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)

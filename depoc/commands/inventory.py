@@ -63,11 +63,11 @@ def udpate(inventory_id: str, location: str) -> None:
 
 
 @inventory.group(invoke_without_command=True)
-@click.option('-id', '--inventory-id')
+@click.option('-id', '--inventory-id', required=True)
 @click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
 @click.pass_context
-def transaction(ctx, inventory_id: str, limit: int, page: int) -> None:
+def t(ctx, inventory_id: str, limit: int, page: int) -> None:
     ''' Retrieve all transactions of a product inventory. '''
     if ctx.invoked_subcommand is None:
         service = client.inventory_transaction.all
@@ -83,7 +83,7 @@ def transaction(ctx, inventory_id: str, limit: int, page: int) -> None:
                 _format_transaction_inventory(obj)
 
 
-@transaction.command
+@t.command
 @click.argument('transaction_id')
 def get(transaction_id) -> None:
     ''' Retrieve an specific transaction of a product inventory. '''
@@ -93,7 +93,7 @@ def get(transaction_id) -> None:
         _format_transaction_inventory(obj)
 
 
-@transaction.command
+@t.command
 @click.argument('inventory_id')
 def create(inventory_id: str) -> None:
     ''' Create a new inventory transaction. '''
@@ -119,7 +119,7 @@ def create(inventory_id: str) -> None:
         _format_transaction_inventory(response)
 
 
-@transaction.command
+@t.command
 @click.argument('transaction')
 @click.option('-q' ,'--quantity')
 @click.option('-c' ,'--unit-cost')
@@ -152,7 +152,7 @@ def update(
         _format_transaction_inventory(response, update=True)
 
 
-@transaction.command
+@t.command
 @click.argument('id')
 def delete(id: str) -> None:
     ''' Delete an specific inventory transaction. '''

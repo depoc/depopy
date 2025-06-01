@@ -33,7 +33,7 @@ def get_tables(tables: list):
 @click.pass_context
 @click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
-def product(ctx, limit: int, page: int) -> None:
+def p(ctx, limit: int, page: int) -> None:
     ''' Manage products. '''
     if ctx.invoked_subcommand is None:
         service = client.products.all
@@ -45,7 +45,7 @@ def product(ctx, limit: int, page: int) -> None:
                _format_product(obj)
 
 
-@product.command
+@p.command
 def create() -> None:
     ''' Create a new product. '''
     panel = Panel('[bold]+ ADD NEW PRODUCT')
@@ -90,16 +90,17 @@ def create() -> None:
         _format_product(response)
 
 
-@product.command
+@p.command
 @click.argument('id')
 def get(id) -> None:
+    ''' Retrieve an specific product. '''
     service = client.products.get
 
     if obj := _handle_response(service, resource_id=id):
         _format_product(obj)
 
 
-@product.command
+@p.command
 @click.argument('id')
 @click.option('-n', '--name')
 @click.option('-s', '--sku')
@@ -156,7 +157,7 @@ def update(
         _format_product(obj, update=True)
 
 
-@product.command
+@p.command
 @click.argument('ids', nargs=-1)
 def delete(ids: str) -> None:
     ''' Delete an specific customer. '''
@@ -178,7 +179,7 @@ def delete(ids: str) -> None:
         if _handle_response(service, resource_id=id):
             console.print('✅ Product inactivated')
 
-@product.group(invoke_without_command=True)
+@p.group(invoke_without_command=True)
 @click.pass_context
 @click.option('-l', '--limit', default=50)
 @click.option('-p', '--page', default=0)
@@ -321,7 +322,7 @@ def delete(ids: str) -> None:
         if _handle_response(service, resource_id=id):
             console.print('✅ Category inactivated')
 
-@product.group()
+@p.group()
 def cost() -> None:
     ''' Manage product cost history. '''
 
