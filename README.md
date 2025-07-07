@@ -1,6 +1,6 @@
 # Depoc API Python Library
  
-I built this library to simplify interaction with the Depoc API, which I'm currently developing. It enables convenient HTTP requests - retrieving, creating, updating, and deleting resources - and allows me to use the API daily in a real business environment.
+I built this library to simplify interaction with the [Depoc API](https://github.com/hugobelem/depoc), which I'm currently developing. It enables convenient HTTP requests - retrieving, creating, updating, and deleting resources - and allows me to use the API daily in a real business environment.
 
 This library also includes a CLI tool, accessible via the `depoc` command, which will be described in detail later.
 
