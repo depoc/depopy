@@ -46,10 +46,6 @@ customers = client.customer.all()
 customer = client.customer.get('ID-KLSJDF331')
 ```
 
-## Handling Exceptions
-
-~~Unsuccessful requests raise exceptions. The class of the exception will reflect the sort of error that occurred.~~
-
 ## Requirements
 
 - Python 3.12+
