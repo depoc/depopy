@@ -12,7 +12,7 @@ This project was inspired by the [stripe-python](https://github.com/stripe/strip
 
 Install via [pip](http://www.pip-installer.org/)
 ```sh
-$ Pip install depoc
+$ pip install depoc
 ```
 
 ## Getting Started
