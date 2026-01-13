@@ -1,12 +1,10 @@
 # Depoc API Python Library
  
-I built this library to simplify interaction with the Depoc API, which I'm currently developing. It enables convenient HTTP requests - retrieving, creating, updating, and deleting resources - and allows me to use the API daily in a real business environment.
+This library simplifies interaction with the Depoc API. It enables convenient HTTP requests - retrieving, creating, updating, and deleting resources.
 
-This library also includes a CLI tool, accessible via the `depoc` command, which will be described in detail later.
+It also ships with a CLI, exposed via the `depoc` command, which is documented in a later section.
 
-Note: Both the API and this library are actively under development and may contain major issues.
-
-This project was inspired by the [stripe-python](https://github.com/stripe/stripe-python) library.
+Note: This library is under active development and may contain breaking changes or unresolved issues.
 
 ## Installation
 
@@ -48,7 +46,7 @@ customer = client.customer.get('ID-KLSJDF331')
 
 ## Handling Exceptions
 
-~~Unsuccessful requests raise exceptions. The class of the exception will reflect the sort of error that occurred.~~
+-
 
 ## Requirements
 
