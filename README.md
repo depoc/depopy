@@ -10,7 +10,7 @@ Note: This library is under active development and may contain breaking changes 
 
 Install via [pip](http://www.pip-installer.org/)
 ```sh
-$ Pip install depoc
+$ pip install depoc
 ```
 
 ## Getting Started
