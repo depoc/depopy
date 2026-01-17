@@ -104,7 +104,7 @@ jobs:
     needs: [setup_and_build, details]
     runs-on: ubuntu-latest
     environment:
-      name: depoc
+      name: pypi
     permissions:
       id-token: write
     steps:
