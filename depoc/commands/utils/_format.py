@@ -712,6 +712,7 @@ def page_summary(response: DepocObject):
     message = (
         f'\n[Page {current_page}/{total_pages}] '
         f'Showing {results_count} results (Total: {response.count})\n'
+        f'Inactive results are not shown\n'
     )
 
     click.echo(message)

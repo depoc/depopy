@@ -14,7 +14,7 @@ class Finder(APIResource[T]):
             limit: int | None = None,
             page: int | None = None,
         ):
-        endpoint = f'{cls.endpoint}/?'
+        endpoint = f'{cls.endpoint}?'
 
         if search:
             endpoint += f'&search={search}'
